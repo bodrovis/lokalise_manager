@@ -4,20 +4,20 @@ describe LokaliseManager::TaskDefinitions::Base do
   let(:described_object) { described_class.new }
 
   describe '.initialize' do
-    it 'allows to override options' do
+    it 'allows to override config' do
       obj = described_class.new token: 'fake'
-      expect(obj.options.token).to eq('fake')
+      expect(obj.config.token).to eq('fake')
     end
   end
 
-  describe '#options' do
-    it 'allows to update options after initialization' do
+  describe '#config' do
+    it 'allows to update config after initialization' do
       obj = described_class.new token: 'fake', project_id: '123'
 
-      obj.options.project_id = '345'
+      obj.config.project_id = '345'
 
-      expect(obj.options.project_id).to eq('345')
-      expect(obj.options.token).to eq('fake')
+      expect(obj.config.project_id).to eq('345')
+      expect(obj.config.token).to eq('fake')
     end
   end
 
@@ -56,11 +56,11 @@ describe LokaliseManager::TaskDefinitions::Base do
 
   describe '.check_options_errors!' do
     it 'raises an error when the API key is not set' do
-      allow(LokaliseManager).to receive(:api_token).and_return(nil)
+      allow(LokaliseManager::GlobalConfig).to receive(:api_token).and_return(nil)
 
       expect(-> { described_object.send(:check_options_errors!) }).to raise_error(LokaliseManager::Error, /API token is not set/i)
 
-      expect(LokaliseManager).to have_received(:api_token)
+      expect(LokaliseManager::GlobalConfig).to have_received(:api_token)
     end
 
     it 'returns an error when the project_id is not set' do
@@ -84,10 +84,10 @@ describe LokaliseManager::TaskDefinitions::Base do
 
   describe '.api_client' do
     it 'is possible to set timeouts' do
-      allow(described_object.options).to receive(:timeouts).and_return({
-                                                                             open_timeout: 100,
-                                                                             timeout: 500
-                                                                           })
+      allow(described_object.config).to receive(:timeouts).and_return({
+                                                                        open_timeout: 100,
+                                                                        timeout: 500
+                                                                      })
 
       expect(described_object.api_client).to be_an_instance_of(Lokalise::Client)
       expect(described_object.api_client.open_timeout).to eq(100)

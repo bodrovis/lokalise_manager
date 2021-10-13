@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors               = ['Ilya Bodrov']
   spec.email                 = ['golosizpru@gmail.com']
   spec.summary               = 'Lokalise integration for Ruby'
-  spec.description           = 'This gem allows to import/export translation files from/to Lokalise TMS.'
+  spec.description           = 'This gem contains a collection of some common tasks for Lokalise. Specifically, it allows to import/export translation files from/to Lokalise TMS.'
   spec.homepage              = 'https://github.com/bodrovis/lokalise_manager'
   spec.license               = 'MIT'
   spec.platform              = Gem::Platform::RUBY
@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'codecov', '~> 0.2'
   spec.add_development_dependency 'dotenv', '~> 2.5'
-  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.6'
   spec.add_development_dependency 'rubocop', '~> 1.0'

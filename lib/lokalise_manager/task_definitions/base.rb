@@ -7,22 +7,25 @@ require 'ostruct'
 module LokaliseManager
   module TaskDefinitions
     class Base
-      attr_accessor :options
+      attr_accessor :config
 
-      def initialize(custom_opts = {})
-        primary_opts = LokaliseManager.singleton_methods.filter { |m| m.to_s.end_with?('=') }.each_with_object({}) do |method, opts|
+      def initialize(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
+        primary_opts = global_config.
+                       singleton_methods.
+                       filter { |m| m.to_s.end_with?('=') }.
+                       each_with_object({}) do |method, opts|
           reader = method.to_s.delete_suffix('=')
-          opts[reader.to_sym] = LokaliseManager.send(reader)
+          opts[reader.to_sym] = global_config.send(reader)
         end
 
-        @options = OpenStruct.new primary_opts.merge(custom_opts)
+        @config = OpenStruct.new primary_opts.merge(custom_opts)
       end
 
       # Creates a Lokalise API client
       #
       # @return [Lokalise::Client]
       def api_client
-        @api_client ||= ::Lokalise.client options.api_token, {enable_compression: true}.merge(options.timeouts)
+        @api_client ||= ::Lokalise.client config.api_token, {enable_compression: true}.merge(config.timeouts)
       end
 
       # Resets API client
@@ -38,8 +41,8 @@ module LokaliseManager
       # @return Array
       def check_options_errors!
         errors = []
-        errors << 'Project ID is not set!' if options.project_id.nil? || options.project_id.empty?
-        errors << 'Lokalise API token is not set!' if options.api_token.nil? || options.api_token.empty?
+        errors << 'Project ID is not set!' if config.project_id.nil? || config.project_id.empty?
+        errors << 'Lokalise API token is not set!' if config.api_token.nil? || config.api_token.empty?
 
         raise(LokaliseManager::Error, errors.join(' ')) if errors.any?
       end
@@ -50,7 +53,7 @@ module LokaliseManager
       # @param raw_path [String, Pathname]
       def proper_ext?(raw_path)
         path = raw_path.is_a?(Pathname) ? raw_path : Pathname.new(raw_path)
-        options.file_ext_regexp.match? path.extname
+        config.file_ext_regexp.match? path.extname
       end
 
       # Returns directory and filename for the given entry
@@ -65,7 +68,7 @@ module LokaliseManager
       #
       # @return [String]
       def project_id_with_branch
-        "#{options.project_id}:#{options.branch}"
+        "#{config.project_id}:#{config.branch}"
       end
 
       # Sends request with exponential backoff mechanism

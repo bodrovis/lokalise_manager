@@ -28,7 +28,7 @@ module LokaliseManager
       # Performs the actual file uploading to Lokalise. If the API rate limit is exceeed,
       # applies exponential backoff
       def do_upload(f_path, r_path)
-        with_exp_backoff(options.max_retries_export) do
+        with_exp_backoff(config.max_retries_export) do
           api_client.upload_file project_id_with_branch, opts(f_path, r_path)
         end
       end
@@ -37,7 +37,7 @@ module LokaliseManager
       def each_file
         return unless block_given?
 
-        loc_path = options.locales_path
+        loc_path = config.locales_path
         Dir["#{loc_path}/**/*"].sort.each do |f|
           full_path = Pathname.new f
 
@@ -60,10 +60,10 @@ module LokaliseManager
         initial_opts = {
           data: Base64.strict_encode64(content.strip),
           filename: relative_p,
-          lang_iso: options.lang_iso_inferer.call(content)
+          lang_iso: config.lang_iso_inferer.call(content)
         }
 
-        initial_opts.merge options.export_opts
+        initial_opts.merge config.export_opts
       end
 
       # Checks whether the specified file has to be processed or not
@@ -72,7 +72,7 @@ module LokaliseManager
       # @param full_path [Pathname]
       def file_matches_criteria?(full_path)
         full_path.file? && proper_ext?(full_path) &&
-          !options.skip_file_export.call(full_path)
+          !config.skip_file_export.call(full_path)
       end
     end
   end

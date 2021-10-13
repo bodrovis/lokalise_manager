@@ -4,7 +4,7 @@ require 'fileutils'
 
 module FileManager
   def mkdir_locales
-    FileUtils.mkdir_p(LokaliseManager.locales_path) unless File.directory?(LokaliseManager.locales_path)
+    FileUtils.mkdir_p(LokaliseManager::GlobalConfig.locales_path) unless File.directory?(LokaliseManager::GlobalConfig.locales_path)
   end
 
   def rm_translation_files
@@ -12,7 +12,7 @@ module FileManager
   end
 
   def locales_dir
-    Dir["#{LokaliseManager.locales_path}/**/*"]
+    Dir["#{LokaliseManager::GlobalConfig.locales_path}/**/*"]
   end
 
   def count_translations

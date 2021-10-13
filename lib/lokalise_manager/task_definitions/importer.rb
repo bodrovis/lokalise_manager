@@ -26,13 +26,13 @@ module LokaliseManager
 
       private
 
-      # Downloads files from Lokalise using the specified options.
+      # Downloads files from Lokalise using the specified config.
       # Utilizes exponential backoff if "too many requests" error is received
       #
       # @return [Hash]
       def download_files
-        with_exp_backoff(options.max_retries_import) do
-          api_client.download_files project_id_with_branch, options.import_opts
+        with_exp_backoff(config.max_retries_import) do
+          api_client.download_files project_id_with_branch, config.import_opts
         end
       rescue StandardError => e
         raise e.class, "There was an error when trying to download files: #{e.message}"
@@ -64,11 +64,11 @@ module LokaliseManager
       def process!(zip_entry)
         data = data_from zip_entry
         subdir, filename = subdir_and_filename_for zip_entry.name
-        full_path = "#{options.locales_path}/#{subdir}"
+        full_path = "#{config.locales_path}/#{subdir}"
         FileUtils.mkdir_p full_path
 
         File.open(File.join(full_path, filename), 'w+:UTF-8') do |f|
-          f.write options.translations_converter.call(data)
+          f.write config.translations_converter.call(data)
         end
       rescue StandardError => e
         raise e.class, "Error when trying to process #{zip_entry&.name}: #{e.message}"
@@ -78,9 +78,9 @@ module LokaliseManager
       #
       # @return [Boolean]
       def proceed_when_safe_mode?
-        return true unless options.import_safe_mode && !Dir.empty?(options.locales_path.to_s)
+        return true unless config.import_safe_mode && !Dir.empty?(config.locales_path.to_s)
 
-        $stdout.puts "The target directory #{options.locales_path} is not empty!"
+        $stdout.puts "The target directory #{config.locales_path} is not empty!"
         $stdout.print 'Enter Y to continue: '
         answer = $stdin.gets
         answer.to_s.strip == 'Y'
@@ -99,7 +99,7 @@ module LokaliseManager
       end
 
       def data_from(zip_entry)
-        options.translations_loader.call zip_entry.get_input_stream.read
+        config.translations_loader.call zip_entry.get_input_stream.read
       end
     end
   end

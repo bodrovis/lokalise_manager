@@ -1,17 +1,15 @@
 # frozen_string_literal: true
-require 'pry'
+
 describe LokaliseManager::TaskDefinitions::Importer do
-  let(:described_object) do 
+  let(:described_object) do
     described_class.new project_id: project_id,
                         api_token: ENV['LOKALISE_API_TOKEN'],
                         max_retries_import: 2
   end
-  let(:loc_path) { described_object.options.locales_path }
+  let(:loc_path) { described_object.config.locales_path }
   let(:project_id) { ENV['LOKALISE_PROJECT_ID'] }
   let(:local_trans) { "#{Dir.getwd}/spec/fixtures/trans.zip" }
-  let(:remote_trans) { 'https://github.com/bodrovis/lokalise_rails/blob/master/spec/dummy/public/trans.zip?raw=true' }
   let(:faulty_trans) { "#{Dir.getwd}/spec/fixtures/faulty_trans.zip" }
-
 
   describe '.open_and_process_zip' do
     it 're-raises errors during file processing' do
@@ -38,9 +36,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
     it 're-raises errors during file download' do
       allow_project_id described_object, 'invalid'
-      
+
       VCR.use_cassette('download_files_error') do
-        expect(-> { described_object.send :download_files}).
+        expect(-> { described_object.send :download_files }).
           to raise_error(Lokalise::Error::BadRequest, /Invalid `project_id` parameter/)
       end
     end
@@ -51,7 +49,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
       it 'handles too many requests' do
         allow(described_object).to receive(:sleep).and_return(0)
 
-        fake_client = double(Lokalise)
+        fake_client = instance_double('Lokalise::Client')
         allow(fake_client).to receive(:download_files).and_raise(Lokalise::Error::TooManyRequests)
         allow(described_object).to receive(:api_client).and_return(fake_client)
 
@@ -63,9 +61,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'halts when the API key is not set' do
-        allow(described_object.options).to receive(:api_token).and_return(nil)
+        allow(described_object.config).to receive(:api_token).and_return(nil)
         expect(-> { described_object.import! }).to raise_error(LokaliseManager::Error, /API token is not set/i)
-        expect(described_object.options).to have_received(:api_token)
+        expect(described_object.config).to have_received(:api_token)
         expect(count_translations).to eq(0)
       end
 
@@ -82,11 +80,11 @@ describe LokaliseManager::TaskDefinitions::Importer do
         mkdir_locales
         rm_translation_files
       end
-  
+
       after :all do
         rm_translation_files
       end
-  
+
       it 'runs import successfully for local files' do
         allow(described_object).to receive(:download_files).and_return(
           {
@@ -94,17 +92,17 @@ describe LokaliseManager::TaskDefinitions::Importer do
             'bundle_url' => local_trans
           }
         )
-  
+
         expect(described_object.import!).to be true
-  
+
         expect(count_translations).to eq(4)
         expect(described_object).to have_received(:download_files)
         expect_file_exist loc_path, 'en/nested/main_en.yml'
         expect_file_exist loc_path, 'en/nested/deep/secondary_en.yml'
         expect_file_exist loc_path, 'ru/main_ru.yml'
       end
-  
-      it 'runs import successfully' do 
+
+      it 'runs import successfully' do
         result = VCR.use_cassette('import') do
           described_object.import!
         end
@@ -118,7 +116,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
     end
 
     context 'when directory is not empty and safe mode enabled' do
-      let(:safe_mode_obj) do 
+      let(:safe_mode_obj) do
         described_class.new project_id: project_id,
                             api_token: ENV['LOKALISE_API_TOKEN'],
                             import_safe_mode: true
@@ -127,16 +125,16 @@ describe LokaliseManager::TaskDefinitions::Importer do
       before :all do
         mkdir_locales
       end
-  
+
       before do
         rm_translation_files
         add_translation_files!
       end
-  
+
       after :all do
         rm_translation_files
       end
-  
+
       it 'import proceeds when the user agrees' do
         allow(safe_mode_obj).to receive(:download_files).and_return(
           {
@@ -144,10 +142,10 @@ describe LokaliseManager::TaskDefinitions::Importer do
             'bundle_url' => local_trans
           }
         )
-  
+
         allow($stdin).to receive(:gets).and_return('Y')
-        expect(-> {safe_mode_obj.import!}).to output(/is not empty/).to_stdout
-  
+        expect(-> { safe_mode_obj.import! }).to output(/is not empty/).to_stdout
+
         expect(count_translations).to eq(5)
         expect($stdin).to have_received(:gets)
         expect(safe_mode_obj).to have_received(:download_files)
@@ -155,12 +153,12 @@ describe LokaliseManager::TaskDefinitions::Importer do
         expect_file_exist loc_path, 'en/nested/deep/secondary_en.yml'
         expect_file_exist loc_path, 'ru/main_ru.yml'
       end
-  
-      it 'import halts when a user chooses not to proceed' do  
+
+      it 'import halts when a user chooses not to proceed' do
         allow(safe_mode_obj).to receive(:download_files).at_most(0).times
         allow($stdin).to receive(:gets).and_return('N')
-        expect(-> {safe_mode_obj.import!}).to output(/is not empty/).to_stdout
-  
+        expect(-> { safe_mode_obj.import! }).to output(/is not empty/).to_stdout
+
         expect(safe_mode_obj).not_to have_received(:download_files)
         expect($stdin).to have_received(:gets)
         expect(count_translations).to eq(1)
