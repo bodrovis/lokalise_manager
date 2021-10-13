@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Adevelop/files/upload
+    body:
+      encoding: UTF-8
+      string: '{"data":"ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=","filename":"nested/en.yml","lang_iso":"en"}'
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - ruby-lokalise-api gem/4.3.1
+      X-api-token:
+      - "<LOKALISE_TOKEN>"
+      Accept-Encoding:
+      - gzip,deflate,br
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      server:
+      - nginx
+      date:
+      - Wed, 13 Oct 2021 14:45:09 GMT
+      content-type:
+      - application/json
+      transfer-encoding:
+      - chunked
+      connection:
+      - keep-alive
+      cache-control:
+      - max-age=0, must-revalidate, no-cache, no-store, private
+      location:
+      - "/api2/projects/672198945b7d72fc048021.15940510:develop/processes/6e47d5f1d7d58879b555f9ea5508ec0b48463fa7"
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - deny
+      x-xss-protection:
+      - 1; mode=block
+      strict-transport-security:
+      - max-age=31536000
+      referrer-policy:
+      - origin
+      expires:
+      - Wed, 13 Oct 2021 14:45:09 GMT
+    body:
+      encoding: UTF-8
+      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"6e47d5f1d7d58879b555f9ea5508ec0b48463fa7","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
+        14:45:09 (Etc\/UTC)","created_at_timestamp":1634136309}}'
+  recorded_at: Wed, 13 Oct 2021 14:45:09 GMT
+recorded_with: VCR 6.0.0

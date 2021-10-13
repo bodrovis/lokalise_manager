@@ -1,0 +1,62 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/download
+    body:
+      encoding: UTF-8
+      string: '{"format":"yaml","placeholder_format":"icu","yaml_include_root":true,"original_filenames":true,"directory_prefix":"","indentation":"2sp"}'
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - ruby-lokalise-api gem/4.3.1
+      X-api-token:
+      - "<LOKALISE_TOKEN>"
+      Accept-Encoding:
+      - gzip,deflate,br
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      server:
+      - nginx
+      date:
+      - Wed, 13 Oct 2021 15:02:20 GMT
+      content-type:
+      - application/json
+      transfer-encoding:
+      - chunked
+      connection:
+      - keep-alive
+      vary:
+      - Accept-Encoding
+      cache-control:
+      - max-age=0, must-revalidate, no-cache, no-store, private
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - deny
+      x-xss-protection:
+      - 1; mode=block
+      strict-transport-security:
+      - max-age=31536000
+      referrer-policy:
+      - origin
+      expires:
+      - Wed, 13 Oct 2021 15:02:20 GMT
+      access-control-allow-origin:
+      - "*"
+      access-control-allow-headers:
+      - Content-Type
+      content-encoding:
+      - gzip
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAEA4WPS27DIBQA78K6mI8/gNc5QJQ1kvUMzyotDpYfViJXvXt9g65mM9Jofti2ly8MdUqRjWwwWjnrun420eglyM5KrRrVu072SrIPNh/PmHE69nzpn7VuNHrhBbUcD/5Cqlw1sMJZnvCiJpTVi1y+ISdCDkRYyYslZbyA763s1Yt/ol5EmC0uRg3KQNC2DRHRgpOh1Q7mVntxw7VMD0iZpvv1w3MJkLE508Z+/wBP/l8o4wAAAA==
+  recorded_at: Wed, 13 Oct 2021 15:02:20 GMT
+recorded_with: VCR 6.0.0
