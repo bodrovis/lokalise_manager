@@ -1,8 +1,8 @@
 # LokaliseManager
 
 ![Gem](https://img.shields.io/gem/v/lokalise_manager)
-[![Build Status](https://travis-ci.com/bodrovis/lokalise_manager.svg?branch=master)](https://travis-ci.com/github/bodrovis/lokalise_rails)
-[![Test Coverage](https://codecov.io/gh/bodrovis/lokalise_manager/graph/badge.svg)](https://codecov.io/gh/bodrovis/lokalise_rails)
+[![Build Status](https://travis-ci.com/bodrovis/lokalise_manager.svg?branch=master)](https://travis-ci.com/github/bodrovis/lokalise_manager)
+[![Test Coverage](https://codecov.io/gh/bodrovis/lokalise_manager/graph/badge.svg)](https://codecov.io/gh/bodrovis/lokalise_manager)
 ![Downloads total](https://img.shields.io/gem/dt/lokalise_manager)
 
 This gem provides [Lokalise](http://lokalise.com) integration for Ruby and allows to exchange translation files easily. It relies on [ruby-lokalise-api](https://lokalise.github.io/ruby-lokalise-api) to send APIv2 requests.
@@ -29,7 +29,7 @@ and run:
 bundle
 ```
 
-### Performing import/export
+### Creating a client
 
 To import or export translation files, you'll have to create the corresponding client:
 
@@ -41,21 +41,46 @@ importer = LokaliseManager.importer api_token: '1234abc', project_id: '123.abc'
 exporter = LokaliseManager.exporter api_token: '1234abc', project_id: '123.abc'
 ```
 
-You must provide an API token and the project ID (project ID can be found in your Lokalise project settings.)
+You *must* provide an API token and a project ID (your project ID can be found under Lokalise project settings). [Other options can be customized as well (see below)](https://github.com/bodrovis/lokalise_manager#configuration) but they have sensible defaults.
 
-Now you can launch the corresponding operation:
+### Importing files from Lokalise into your project
+
+To download translation files from Lokalise in your project (by default all files will be stored under the `locales/` directory), run the following code:
 
 ```ruby
-result = importer.import! # => Returns `true` or `false`
-
-# OR
-
-processes = exporter.export! # => Returns an array of queued background processes (file uploading in performed in the background on Lokalise)
+result = importer.import!
 ```
+
+The `result` will contain a boolean value which says whether the operation was successfull or not.
 
 Please note that upon importing translations any duplicating files inside the `locales` directory (or any other directory that you've specified in the options) will be overwritten! You can enable [safe mode](https://github.com/bodrovis/lokalise_rails#import-settings) to check whether the folder is empty or not.
 
-Other options can be customized as well (see below) but they have sensible defaults.
+### Exporting files from your project to Lokalise
+
+To upload your translation files from a local directory (defaults to `locales/`) to a Lokalise project, run the following code: 
+
+```ruby
+processes = exporter.export!
+```
+
+`processes` will contain an array of queued background processes as uploading is done in the background on Lokalise. You can perform periodic checks to read the status of the process. Here's a very simple example:
+
+```ruby
+def uploaded?(process)
+  5.times do # try to check the status 5 times
+    process = process.reload_data # load new data
+    return(true) if process.status == 'finished' # return true is the upload has finished
+    sleep 1 # wait for 1 second, adjust this number with regards to the upload size
+  end
+
+  false # if all 5 checks failed, return false (probably something is wrong)
+end
+
+processes = exporter.export!
+uploaded? processes[0]
+```
+
+Please don't forget that Lokalise API has rate limiting and you cannot send more than six requests per second.
 
 ## Configuration
 
@@ -194,7 +219,7 @@ class CustomConfig < LokaliseManager::GlobalConfig
 end
 ```
 
-Check `global_config.rb` source to find other defaults.
+Check [`global_config.rb` source](https://github.com/bodrovis/lokalise_manager/blob/master/lib/lokalise_manager/global_config.rb) to find other defaults.
 
 Now when you have created a custom config, you can also set some global options (this is not required though):
 
