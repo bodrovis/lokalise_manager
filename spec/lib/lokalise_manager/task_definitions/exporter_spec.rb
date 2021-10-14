@@ -74,7 +74,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           described_object.export!
         end.first
 
-        expect(described_object.config).to have_received(:branch)
+        expect(described_object.config).to have_received(:branch).at_most(2).times
         expect(process.project_id).to eq(project_id)
         expect(process.status).to eq('queued')
       end

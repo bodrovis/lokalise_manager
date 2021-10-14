@@ -6,7 +6,6 @@ require 'simplecov'
 SimpleCov.start do
   add_filter 'spec/'
   add_filter '.github/'
-  add_filter 'lib/lokalise_manager/version'
 end
 
 if ENV['CI'] == 'true'

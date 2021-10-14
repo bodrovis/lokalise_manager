@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/upload
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
       string: '{"data":"LS0tCmVuOgogIGtleV8wOiB2YWx1ZSAw","filename":"en_0.yml","lang_iso":"en"}'
@@ -23,7 +23,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Wed, 13 Oct 2021 14:26:42 GMT
+      - Thu, 14 Oct 2021 12:34:17 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -33,7 +33,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510:master/processes/a0cc024ccf90fc71598fe9826e9325edb1b59233"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/4be1d9b531dde3ce452105be04ac0811e48ca9c8"
       pragma:
       - no-cache
       x-content-type-options:
@@ -47,15 +47,15 @@ http_interactions:
       referrer-policy:
       - origin
       expires:
-      - Wed, 13 Oct 2021 14:26:42 GMT
+      - Thu, 14 Oct 2021 12:34:17 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"a0cc024ccf90fc71598fe9826e9325edb1b59233","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
-        14:26:42 (Etc\/UTC)","created_at_timestamp":1634135202}}'
-  recorded_at: Wed, 13 Oct 2021 14:26:42 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"4be1d9b531dde3ce452105be04ac0811e48ca9c8","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
+        12:34:17 (Etc\/UTC)","created_at_timestamp":1634214857}}'
+  recorded_at: Thu, 14 Oct 2021 12:34:18 GMT
 - request:
     method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/upload
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
       string: '{"data":"LS0tCmVuOgogIGtleV8xOiB2YWx1ZSAx","filename":"en_1.yml","lang_iso":"en"}'
@@ -76,7 +76,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Wed, 13 Oct 2021 14:26:43 GMT
+      - Thu, 14 Oct 2021 12:34:18 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -86,7 +86,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510:master/processes/76334a3a6d55dc187cd4e1b077a9534fcae72a82"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/ac2d4b202abfb2978b7cf0e498f43380e5455d0c"
       pragma:
       - no-cache
       x-content-type-options:
@@ -100,15 +100,15 @@ http_interactions:
       referrer-policy:
       - origin
       expires:
-      - Wed, 13 Oct 2021 14:26:43 GMT
+      - Thu, 14 Oct 2021 12:34:18 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"76334a3a6d55dc187cd4e1b077a9534fcae72a82","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
-        14:26:43 (Etc\/UTC)","created_at_timestamp":1634135203}}'
-  recorded_at: Wed, 13 Oct 2021 14:26:43 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"ac2d4b202abfb2978b7cf0e498f43380e5455d0c","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
+        12:34:18 (Etc\/UTC)","created_at_timestamp":1634214858}}'
+  recorded_at: Thu, 14 Oct 2021 12:34:19 GMT
 - request:
     method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/upload
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
       string: '{"data":"LS0tCmVuOgogIGtleV8yOiB2YWx1ZSAy","filename":"en_2.yml","lang_iso":"en"}'
@@ -129,7 +129,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Wed, 13 Oct 2021 14:26:43 GMT
+      - Thu, 14 Oct 2021 12:34:19 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -139,7 +139,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510:master/processes/8bd0c82ee8b5f387cfe1e41c74c8d8f4cc309c49"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/91810f63d1bb1fa536854a4650f6abdebdcddbf1"
       pragma:
       - no-cache
       x-content-type-options:
@@ -153,15 +153,15 @@ http_interactions:
       referrer-policy:
       - origin
       expires:
-      - Wed, 13 Oct 2021 14:26:43 GMT
+      - Thu, 14 Oct 2021 12:34:19 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"8bd0c82ee8b5f387cfe1e41c74c8d8f4cc309c49","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
-        14:26:43 (Etc\/UTC)","created_at_timestamp":1634135203}}'
-  recorded_at: Wed, 13 Oct 2021 14:26:44 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"91810f63d1bb1fa536854a4650f6abdebdcddbf1","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
+        12:34:19 (Etc\/UTC)","created_at_timestamp":1634214859}}'
+  recorded_at: Thu, 14 Oct 2021 12:34:19 GMT
 - request:
     method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/upload
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
       string: '{"data":"LS0tCmVuOgogIGtleV8zOiB2YWx1ZSAz","filename":"en_3.yml","lang_iso":"en"}'
@@ -182,7 +182,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Wed, 13 Oct 2021 14:26:44 GMT
+      - Thu, 14 Oct 2021 12:34:20 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -192,7 +192,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510:master/processes/e3751466aa2648fb0a3485529aa65ae48692538c"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/50ec7617c1c1d66bb63f998c318092f298430f69"
       pragma:
       - no-cache
       x-content-type-options:
@@ -206,15 +206,15 @@ http_interactions:
       referrer-policy:
       - origin
       expires:
-      - Wed, 13 Oct 2021 14:26:44 GMT
+      - Thu, 14 Oct 2021 12:34:20 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"e3751466aa2648fb0a3485529aa65ae48692538c","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
-        14:26:44 (Etc\/UTC)","created_at_timestamp":1634135204}}'
-  recorded_at: Wed, 13 Oct 2021 14:26:44 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"50ec7617c1c1d66bb63f998c318092f298430f69","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
+        12:34:20 (Etc\/UTC)","created_at_timestamp":1634214860}}'
+  recorded_at: Thu, 14 Oct 2021 12:34:20 GMT
 - request:
     method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/upload
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
       string: '{"data":"LS0tCmVuOgogIGtleV80OiB2YWx1ZSA0","filename":"en_4.yml","lang_iso":"en"}'
@@ -235,7 +235,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Wed, 13 Oct 2021 14:26:45 GMT
+      - Thu, 14 Oct 2021 12:34:20 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -245,7 +245,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510:master/processes/b056631ce19bc2c764be62b6fa9ef10696a9a4de"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/17a7c1260e914d81575931221b65c728d38558a1"
       pragma:
       - no-cache
       x-content-type-options:
@@ -259,15 +259,15 @@ http_interactions:
       referrer-policy:
       - origin
       expires:
-      - Wed, 13 Oct 2021 14:26:45 GMT
+      - Thu, 14 Oct 2021 12:34:20 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"b056631ce19bc2c764be62b6fa9ef10696a9a4de","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
-        14:26:45 (Etc\/UTC)","created_at_timestamp":1634135205}}'
-  recorded_at: Wed, 13 Oct 2021 14:26:45 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"17a7c1260e914d81575931221b65c728d38558a1","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
+        12:34:20 (Etc\/UTC)","created_at_timestamp":1634214860}}'
+  recorded_at: Thu, 14 Oct 2021 12:34:21 GMT
 - request:
     method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/upload
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
       string: '{"data":"ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=","filename":"nested/en.yml","lang_iso":"en"}'
@@ -288,7 +288,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Wed, 13 Oct 2021 14:26:46 GMT
+      - Thu, 14 Oct 2021 12:34:21 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -298,7 +298,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510:master/processes/fd1291261e72057c1f4b5beb6b4e11df9e75fb57"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/1cb5656120d87324cf3fd6908d215a94e9c4500d"
       pragma:
       - no-cache
       x-content-type-options:
@@ -312,15 +312,15 @@ http_interactions:
       referrer-policy:
       - origin
       expires:
-      - Wed, 13 Oct 2021 14:26:46 GMT
+      - Thu, 14 Oct 2021 12:34:21 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"fd1291261e72057c1f4b5beb6b4e11df9e75fb57","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
-        14:26:46 (Etc\/UTC)","created_at_timestamp":1634135206}}'
-  recorded_at: Wed, 13 Oct 2021 14:26:46 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"1cb5656120d87324cf3fd6908d215a94e9c4500d","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
+        12:34:21 (Etc\/UTC)","created_at_timestamp":1634214861}}'
+  recorded_at: Thu, 14 Oct 2021 12:34:21 GMT
 - request:
     method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510%3Amaster/files/upload
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
       string: '{"data":"cnVfUlU6CiAgbXlfa2V5OiAi0JzQvtGRINC30L3QsNGH0LXQvdC40LUiCiAgbmVzdGVkOgogICAga2V5OiAi0JfQvdCw0YfQtdC90LjQtSAyIg==","filename":"ru.yml","lang_iso":"ru_RU"}'
@@ -341,7 +341,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Wed, 13 Oct 2021 14:26:47 GMT
+      - Thu, 14 Oct 2021 12:34:22 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -351,7 +351,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510:master/processes/13a20fc32773d4fa9b317f42c42d268b4680fd99"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/4ea4755620af985b7d20ce05ec0dc683b24639b0"
       pragma:
       - no-cache
       x-content-type-options:
@@ -365,10 +365,10 @@ http_interactions:
       referrer-policy:
       - origin
       expires:
-      - Wed, 13 Oct 2021 14:26:47 GMT
+      - Thu, 14 Oct 2021 12:34:22 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","process":{"process_id":"13a20fc32773d4fa9b317f42c42d268b4680fd99","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-13
-        14:26:47 (Etc\/UTC)","created_at_timestamp":1634135207}}'
-  recorded_at: Wed, 13 Oct 2021 14:26:47 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"4ea4755620af985b7d20ce05ec0dc683b24639b0","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
+        12:34:22 (Etc\/UTC)","created_at_timestamp":1634214862}}'
+  recorded_at: Thu, 14 Oct 2021 12:34:22 GMT
 recorded_with: VCR 6.0.0

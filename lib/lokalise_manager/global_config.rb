@@ -21,7 +21,7 @@ module LokaliseManager
 
       # Project branch to use
       def branch
-        @branch || 'master'
+        @branch || ''
       end
 
       # Set request timeouts for the Lokalise API client

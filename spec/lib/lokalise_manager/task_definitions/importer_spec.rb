@@ -109,7 +109,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
         expect(result).to be true
 
-        expect(count_translations).to eq(4)
+        expect(count_translations).to eq(8)
         expect_file_exist loc_path, 'en.yml'
         expect_file_exist loc_path, 'ru.yml'
       end

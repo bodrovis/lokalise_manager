@@ -5,7 +5,7 @@
 [![Test Coverage](https://codecov.io/gh/bodrovis/lokalise_manager/graph/badge.svg)](https://codecov.io/gh/bodrovis/lokalise_manager)
 ![Downloads total](https://img.shields.io/gem/dt/lokalise_manager)
 
-This gem provides [Lokalise](http://lokalise.com) integration for Ruby and allows to exchange translation files easily. It relies on [ruby-lokalise-api](https://lokalise.github.io/ruby-lokalise-api) to send APIv2 requests.
+This gem provides [Lokalise](http://lokalise.com) integration for Ruby and allows to exchange translation files between your project and TMS easily. It relies on [ruby-lokalise-api](https://lokalise.github.io/ruby-lokalise-api) to send APIv2 requests.
 
 If you are looking for a Rails integration, please check [lokalise_rails](https://github.com/bodrovis/lokalise_rails) which provides a set of Rake tasks for importing/exporting.
 
@@ -45,7 +45,7 @@ You *must* provide an API token and a project ID (your project ID can be found u
 
 ### Importing files from Lokalise into your project
 
-To download translation files from Lokalise in your project (by default all files will be stored under the `locales/` directory), run the following code:
+To download translation files from Lokalise into your project (by default all files will be stored under the `locales/` directory), run the following code:
 
 ```ruby
 result = importer.import!
@@ -53,7 +53,7 @@ result = importer.import!
 
 The `result` will contain a boolean value which says whether the operation was successfull or not.
 
-Please note that upon importing translations any duplicating files inside the `locales` directory (or any other directory that you've specified in the options) will be overwritten! You can enable [safe mode](https://github.com/bodrovis/lokalise_rails#import-settings) to check whether the folder is empty or not.
+Please note that upon importing translations any duplicating files inside the `locales` directory (or any other directory that you've specified in the options) will be overwritten! You can enable [safe mode](https://github.com/bodrovis/lokalise_manager#import-config) to check whether the folder is empty or not.
 
 ### Exporting files from your project to Lokalise
 
@@ -89,7 +89,7 @@ Please don't forget that Lokalise API has rate limiting and you cannot send more
 * `api_token` (`string`, required) — Lokalise API token with read/write permissions.
 * `project_id` (`string`, required) — Lokalise project ID. You must have import/export permissions in the specified project.
 * `locales_path` (`string`) — path to the directory with your translation files. Defaults to `"#{Dir.getwd}/locales"`.
-* `branch` (`string`) — Lokalise project branch to use. Defaults to `"master"`.
+* `branch` (`string`) — Lokalise project branch to use. Defaults to `""` (no branch is provided).
 * `timeouts` (`hash`) — set [request timeouts for the Lokalise API client](https://lokalise.github.io/ruby-lokalise-api/additional_info/customization#setting-timeouts). By default, requests have no timeouts: `{open_timeout: nil, timeout: nil}`. Both values are in seconds.
 
 ### Import config
@@ -117,10 +117,16 @@ importer = LokaliseManager.importer api_token: '1234abc',
                                     import_opts: {original_filenames: true}
 ```
 
-In this case the `import_opts` will have `original_filenames` set to `true` and will also contain all the defaults (`format`, `placeholder_format`, and others).
+In this case the `import_opts` will have `original_filenames` set to `true` and will also contain all the defaults (`format`, `placeholder_format`, and others). Of course, you can override defaults as well:
+
+```ruby
+importer = LokaliseManager.importer api_token: '1234abc',
+                                    project_id: '123.abc',
+                                    import_opts: {indentation: '4sp}
+```
 
 * `import_safe_mode` (`boolean`) — default to `false`. When this option is enabled, the import task will check whether the directory set with `locales_path` is empty or not. If it is not empty, you will be prompted to continue.
-* `max_retries_import` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, LokaliseRails will apply an exponential backoff mechanism with a very simple formula: `2 ** retries`. If the maximum number of retries has been reached, a `Lokalise::Error::TooManyRequests` exception will be raised and the export operation will be halted.
+* `max_retries_import` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, this gem will apply an exponential backoff mechanism with a very simple formula: `2 ** retries`. If the maximum number of retries has been reached, a `Lokalise::Error::TooManyRequests` exception will be raised and the operation will be halted.
 
 ### Export config
 
@@ -144,7 +150,7 @@ exporter = LokaliseManager.exporter api_token: '1234abc',
 
 In this case the `export_opts` will have `detect_icu_plurals` set to `true` and will also contain all the defaults (`data`, `filename`, and `lang_iso`).
 
-**Please note** that if your Lokalise project does not have a language with the specified `lang_iso` code, the export will fail.
+**Please note** that if your Lokalise project does not have a language with the specified `lang_iso` code, the export will fail. It means that you first have to add all the locales to the project and then start the exporting process.
 
 * `skip_file_export` (`lambda` or `proc`) — specify additional exclusion criteria for the exported files. By default, the rake task will ignore all non-file entries and all files with improper extensions (the latter is controlled by the `file_ext_regexp`). Lambda passed to this option should accept a single argument which is full path to the file (instance of the [`Pathname` class](https://ruby-doc.org/stdlib-2.7.1/libdoc/pathname/rdoc/Pathname.html)). For example, to exclude all files that have `fr` part in their names, add the following config:
 
@@ -163,8 +169,8 @@ If your translation files are not in YAML format, you will need to adjust the fo
 * `translations_converter` (`lambda` or `proc`) — converts translations data to a proper format before saving them to a translation file. Defaults to `->(raw_data) { raw_data.to_yaml }`. In the simplest case you may just return the data back, for example `-> (raw_data) { raw_data }`.
 * `lang_iso_inferer` (`lambda` or `proc`) — infers language ISO code based on the translation file data before uploading it to Lokalise. Defaults to `->(data) { YAML.safe_load(data)&.keys&.first }`.
 
-
 ## Providing config options
+
 ### Per-client
 
 The simplest way to provide your config is on per-client basis, for example:
@@ -179,7 +185,7 @@ importer = LokaliseManager.importer api_token: '1234abc',
 
 These options will be merged with the default ones. Please note that per-client config has the highest priority.
 
-You can also individual options later using the `#config` instance variable (it contains an OpenStruct object):
+You can also adjust individual options later using the `#config` instance variable (it contains an OpenStruct object):
 
 ```
 importer.config.project_id = '678xyz'
@@ -191,7 +197,7 @@ importer.config.branch = 'develop'
 You can also provide config globally. To achieve that, call `.config` on `LokaliseManager::Config` class:
 
 ```ruby
-LokaliseManager::Config.config do |c|
+LokaliseManager::GlobalConfig.config do |c|
   c.api_token = '12345'
   c.project_id = '123.abc'
 
@@ -203,7 +209,7 @@ Global config takes precedence over the default options, however per-client conf
 
 ### Overriding defaults
 
-You can even subclass the default `Config` class and provide the new defaults:
+You can even subclass the default `GlobalConfig` class and provide the new defaults:
 
 ```ruby
 class CustomConfig < LokaliseManager::GlobalConfig
@@ -213,7 +219,7 @@ class CustomConfig < LokaliseManager::GlobalConfig
     end
 
     def locales_path
-      @locales_path || "#{Dir.getwd}/locales"
+      @locales_path || "#{Dir.getwd}/i18n/locales"
     end
   end
 end

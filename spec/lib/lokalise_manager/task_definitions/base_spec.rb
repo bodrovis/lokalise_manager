@@ -3,7 +3,7 @@
 describe LokaliseManager::TaskDefinitions::Base do
   let(:described_object) { described_class.new }
 
-  describe '.initialize' do
+  describe '.new' do
     it 'allows to override config' do
       obj = described_class.new token: 'fake'
       expect(obj.config.token).to eq('fake')
@@ -31,7 +31,12 @@ describe LokaliseManager::TaskDefinitions::Base do
   specify '.project_id_with_branch!' do
     result = described_object.send :project_id_with_branch
     expect(result).to be_an_instance_of(String)
-    expect(result).to include(':master')
+    expect(result).not_to include(':master')
+
+    described_object.config.branch = 'develop'
+    result = described_object.send :project_id_with_branch
+    expect(result).to be_an_instance_of(String)
+    expect(result).to include(':develop')
   end
 
   describe '.subdir_and_filename_for' do

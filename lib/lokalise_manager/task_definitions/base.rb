@@ -9,6 +9,11 @@ module LokaliseManager
     class Base
       attr_accessor :config
 
+      # Creates a new importer or exporter. It accepts custom config and merges it
+      # with the global config (custom config take precendence)
+      #
+      # @param custom_opts [Hash]
+      # @param global_config [Object]
       def initialize(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
         primary_opts = global_config.
                        singleton_methods.
@@ -68,6 +73,8 @@ module LokaliseManager
       #
       # @return [String]
       def project_id_with_branch
+        return config.project_id.to_s if config.branch.to_s.strip.empty?
+
         "#{config.project_id}:#{config.branch}"
       end
 
