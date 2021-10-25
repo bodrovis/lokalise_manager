@@ -14,6 +14,11 @@ describe LokaliseManager::GlobalConfig do
     fake_class.project_id = '123.abc'
   end
 
+  it 'is possible to set use_oauth2_token' do
+    allow(fake_class).to receive(:use_oauth2_token=).with(true)
+    fake_class.use_oauth2_token = true
+  end
+
   it 'is possible to set file_ext_regexp' do
     allow(fake_class).to receive(:file_ext_regexp=).with(Regexp.new('.*'))
     fake_class.file_ext_regexp = Regexp.new('.*')

@@ -87,6 +87,7 @@ Please don't forget that Lokalise API has rate limiting and you cannot send more
 ### Common config
 
 * `api_token` (`string`, required) — Lokalise API token with read/write permissions.
+* `use_oauth2_token` (`boolean`) — whether you would like to use a token obtained via [OAuth 2 flow](https://docs.lokalise.com/en/articles/5574713-oauth-2). Defaults to `false`.
 * `project_id` (`string`, required) — Lokalise project ID. You must have import/export permissions in the specified project.
 * `locales_path` (`string`) — path to the directory with your translation files. Defaults to `"#{Dir.getwd}/locales"`.
 * `branch` (`string`) — Lokalise project branch to use. Defaults to `""` (no branch is provided).
@@ -168,6 +169,10 @@ If your translation files are not in YAML format, you will need to adjust the fo
 * `translations_loader` (`lambda` or `proc`) — loads translations data and makes sure they are valid before saving them to a translation file. Defaults to `->(raw_data) { YAML.safe_load raw_data }`. In the simplest case you may just return the data back, for example `-> (raw_data) { raw_data }`.
 * `translations_converter` (`lambda` or `proc`) — converts translations data to a proper format before saving them to a translation file. Defaults to `->(raw_data) { raw_data.to_yaml }`. In the simplest case you may just return the data back, for example `-> (raw_data) { raw_data }`.
 * `lang_iso_inferer` (`lambda` or `proc`) — infers language ISO code based on the translation file data before uploading it to Lokalise. Defaults to `->(data) { YAML.safe_load(data)&.keys&.first }`.
+
+### Customizing JSON parser and network adapter
+
+JSON parser and network adapter utilized by lokalise_manager can be customized as well. Please check [ruby-lokalise-api doc](https://lokalise.github.io/ruby-lokalise-api/additional_info/customization) to learn more.
 
 ## Providing config options
 

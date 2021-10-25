@@ -94,9 +94,20 @@ describe LokaliseManager::TaskDefinitions::Base do
                                                                         timeout: 500
                                                                       })
 
-      expect(described_object.api_client).to be_an_instance_of(Lokalise::Client)
-      expect(described_object.api_client.open_timeout).to eq(100)
-      expect(described_object.api_client.timeout).to eq(500)
+      client = described_object.api_client
+      expect(client).to be_an_instance_of(Lokalise::Client)
+      expect(client).not_to be_an_instance_of(Lokalise::OAuthClient)
+      expect(client.open_timeout).to eq(100)
+      expect(client.timeout).to eq(500)
+    end
+
+    it 'uses .oauth_client when the use_oauth2_token is true' do
+      allow(described_object.config).to receive(:use_oauth2_token).and_return(true)
+
+      client = described_object.api_client
+
+      expect(client).to be_an_instance_of(Lokalise::OAuthClient)
+      expect(client).not_to be_an_instance_of(Lokalise::Client)
     end
   end
 end

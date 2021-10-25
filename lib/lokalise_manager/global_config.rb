@@ -7,11 +7,17 @@ module LokaliseManager
       attr_writer :import_opts, :import_safe_mode, :export_opts, :locales_path,
                   :file_ext_regexp, :skip_file_export, :branch, :timeouts,
                   :translations_loader, :translations_converter, :lang_iso_inferer,
-                  :max_retries_export, :max_retries_import
+                  :max_retries_export, :max_retries_import, :use_oauth2_token
 
       # Main interface to provide configuration options
       def config
         yield self
+      end
+
+      # When enabled, will use OAuth 2 Lokalise client and will require to provide a token obtained via OAuth 2 flow
+      # rather than via Lokalise profile
+      def use_oauth2_token
+        @use_oauth2_token || false
       end
 
       # Full path to directory with translation files

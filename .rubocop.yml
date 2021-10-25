@@ -57,6 +57,7 @@ Style/Documentation:
 
 Layout/DotPosition:
   EnforcedStyle: trailing
+  Enabled: false # bug with loop
 
 Naming/FileName:
   Enabled: false
