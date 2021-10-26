@@ -14,6 +14,11 @@ describe LokaliseManager::GlobalConfig do
     fake_class.project_id = '123.abc'
   end
 
+  it 'is possible to set silent_mode' do
+    allow(fake_class).to receive(:silent_mode=).with(true)
+    fake_class.silent_mode = true
+  end
+
   it 'is possible to set use_oauth2_token' do
     allow(fake_class).to receive(:use_oauth2_token=).with(true)
     fake_class.use_oauth2_token = true

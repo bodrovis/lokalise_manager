@@ -94,6 +94,7 @@ Please don't forget that Lokalise API has rate limiting and you cannot send more
 * `locales_path` (`string`) — path to the directory with your translation files. Defaults to `"#{Dir.getwd}/locales"`.
 * `branch` (`string`) — Lokalise project branch to use. Defaults to `""` (no branch is provided).
 * `timeouts` (`hash`) — set [request timeouts for the Lokalise API client](https://lokalise.github.io/ruby-lokalise-api/additional_info/customization#setting-timeouts). By default, requests have no timeouts: `{open_timeout: nil, timeout: nil}`. Both values are in seconds.
+* `silent_mode` (`boolean`) — whether you would like to output debugging information to `$stdout`. By default, after a task is performed, a short notification message will be printed out to the terminal. When set to `false`, notifications won't be printed. Please note that currently `import_safe_mode` has higher priority. Even if you enable `silent_mode`, and the `import_safe_mode` is enabled as well, you will be prompted to confirm the import operation if the target directory is not empty.
 
 ### Import config
 

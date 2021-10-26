@@ -23,7 +23,7 @@ module LokaliseManager
           opts[reader.to_sym] = global_config.send(reader)
         end
 
-        @config = OpenStruct.new primary_opts.merge(custom_opts)
+        @config = OpenStruct.new primary_opts.deep_merge(custom_opts)
       end
 
       # Creates a Lokalise API client

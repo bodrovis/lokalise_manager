@@ -7,11 +7,16 @@ module LokaliseManager
       attr_writer :import_opts, :import_safe_mode, :export_opts, :locales_path,
                   :file_ext_regexp, :skip_file_export, :branch, :timeouts,
                   :translations_loader, :translations_converter, :lang_iso_inferer,
-                  :max_retries_export, :max_retries_import, :use_oauth2_token
+                  :max_retries_export, :max_retries_import, :use_oauth2_token, :silent_mode
 
       # Main interface to provide configuration options
       def config
         yield self
+      end
+
+      # When enabled, won't print any debugging info to $stdout
+      def silent_mode
+        @silent_mode || false
       end
 
       # When enabled, will use OAuth 2 Lokalise client and will require to provide a token obtained via OAuth 2 flow

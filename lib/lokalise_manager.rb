@@ -2,6 +2,8 @@
 
 require 'yaml'
 
+require 'ext/hash'
+
 require 'lokalise_manager/version'
 require 'lokalise_manager/error'
 require 'lokalise_manager/global_config'

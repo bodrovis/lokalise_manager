@@ -18,7 +18,7 @@ module LokaliseManager
           raise e.class, "Error while trying to upload #{full_path}: #{e.message}"
         end
 
-        $stdout.print 'Task complete!'
+        $stdout.print('Task complete!') unless config.silent_mode
 
         queued_processes
       end

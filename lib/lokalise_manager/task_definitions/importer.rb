@@ -14,13 +14,13 @@ module LokaliseManager
         check_options_errors!
 
         unless proceed_when_safe_mode?
-          $stdout.print 'Task cancelled!'
+          $stdout.print('Task cancelled!') unless config.silent_mode
           return false
         end
 
         open_and_process_zip download_files['bundle_url']
 
-        $stdout.print 'Task complete!'
+        $stdout.print('Task complete!') unless config.silent_mode
         true
       end
 

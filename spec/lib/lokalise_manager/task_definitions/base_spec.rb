@@ -19,6 +19,11 @@ describe LokaliseManager::TaskDefinitions::Base do
       expect(obj.config.project_id).to eq('345')
       expect(obj.config.token).to eq('fake')
     end
+
+    it 'tes' do
+      obj = described_class.new import_opts: {filter_langs: ['fr']}
+      puts obj.config
+    end
   end
 
   specify '.reset_client!' do

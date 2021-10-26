@@ -24,9 +24,11 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
     describe '.export!' do
       it 'sends a proper API request and handles rate limiting' do
-        process = VCR.use_cassette('upload_files_multiple') do
-          described_object.export!
-        end.first
+        process = nil
+
+        VCR.use_cassette('upload_files_multiple') do
+          expect(-> { process = described_object.export!.first }).to output(/complete!/).to_stdout
+        end
 
         expect(process.project_id).to eq(project_id)
         expect(process.status).to eq('queued')
@@ -58,6 +60,19 @@ describe LokaliseManager::TaskDefinitions::Exporter do
     end
 
     describe '.export!' do
+      it 'sends a proper API request but does not output anything when silent_mode is enabled' do
+        allow(described_object.config).to receive(:silent_mode).and_return(true)
+
+        process = nil
+
+        VCR.use_cassette('upload_files') do
+          expect(-> { process = described_object.export!.first }).not_to output(/complete!/).to_stdout
+        end
+
+        expect(process.status).to eq('queued')
+        expect(described_object.config).to have_received(:silent_mode).at_most(1).times
+      end
+
       it 'sends a proper API request' do
         process = VCR.use_cassette('upload_files') do
           described_object.export!

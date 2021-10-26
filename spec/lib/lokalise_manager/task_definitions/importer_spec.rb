@@ -103,8 +103,10 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'runs import successfully' do
-        result = VCR.use_cassette('import') do
-          described_object.import!
+        result = nil
+
+        VCR.use_cassette('import') do
+          expect(-> { result = described_object.import! }).to output(/complete!/).to_stdout
         end
 
         expect(result).to be true
@@ -112,6 +114,20 @@ describe LokaliseManager::TaskDefinitions::Importer do
         expect(count_translations).to eq(8)
         expect_file_exist loc_path, 'en.yml'
         expect_file_exist loc_path, 'ru.yml'
+      end
+
+      it 'runs import successfully but does not provide any output when silent_mode is enabled' do
+        allow(described_object.config).to receive(:silent_mode).and_return(true)
+        result = nil
+
+        VCR.use_cassette('import') do
+          expect(-> { result = described_object.import! }).not_to output(/complete!/).to_stdout
+        end
+
+        expect(result).to be true
+        expect_file_exist loc_path, 'en.yml'
+        expect_file_exist loc_path, 'ru.yml'
+        expect(described_object.config).to have_received(:silent_mode).at_most(1).times
       end
     end
 
@@ -157,9 +173,21 @@ describe LokaliseManager::TaskDefinitions::Importer do
       it 'import halts when a user chooses not to proceed' do
         allow(safe_mode_obj).to receive(:download_files).at_most(0).times
         allow($stdin).to receive(:gets).and_return('N')
-        expect(-> { safe_mode_obj.import! }).to output(/is not empty/).to_stdout
+        expect(-> { safe_mode_obj.import! }).to output(/cancelled/).to_stdout
 
         expect(safe_mode_obj).not_to have_received(:download_files)
+        expect($stdin).to have_received(:gets)
+        expect(count_translations).to eq(1)
+      end
+
+      it 'import halts when a user chooses not to proceed and debug info is not printed out when silent_mode is enabled' do
+        allow(safe_mode_obj.config).to receive(:silent_mode).and_return(true)
+        allow(safe_mode_obj).to receive(:download_files).at_most(0).times
+        allow($stdin).to receive(:gets).and_return('N')
+        expect(-> { safe_mode_obj.import! }).not_to output(/cancelled/).to_stdout
+
+        expect(safe_mode_obj).not_to have_received(:download_files)
+        expect(safe_mode_obj.config).to have_received(:silent_mode)
         expect($stdin).to have_received(:gets)
         expect(count_translations).to eq(1)
       end
