@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 (26-Nov-21)
+
+* Use refinements instead of monkey patching to add hash methods
+* Don't use `OpenStruct` anymore to store config opts
+* Minor fixes
+
 ## 1.2.0 (26-Oct-21)
 
 * Add a new option `:silent_mode` which is `false` by default. When silent mode is enabled, no debug info will be printed out to `$stdout`. The only exception are the "safe mode" messages — you'll still be prompted to continue if the target directory is not empty.

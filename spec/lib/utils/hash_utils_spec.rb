@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-describe Hash do
+describe LokaliseManager::Utils::HashUtils do
+  using described_class
   let(:h1) { {a: 100, b: 200, c: {c1: 100}} }
   let(:h2) { {b: 250, c: {c1: 200}} }
 

@@ -2,11 +2,12 @@
 
 require 'ruby-lokalise-api'
 require 'pathname'
-require 'ostruct'
 
 module LokaliseManager
   module TaskDefinitions
     class Base
+      using LokaliseManager::Utils::HashUtils
+
       attr_accessor :config
 
       # Creates a new importer or exporter. It accepts custom config and merges it
@@ -23,7 +24,11 @@ module LokaliseManager
           opts[reader.to_sym] = global_config.send(reader)
         end
 
-        @config = OpenStruct.new primary_opts.deep_merge(custom_opts)
+        all_opts = primary_opts.deep_merge(custom_opts)
+
+        config_klass = Struct.new(*all_opts.keys, keyword_init: true)
+
+        @config = config_klass.new all_opts
       end
 
       # Creates a Lokalise API client

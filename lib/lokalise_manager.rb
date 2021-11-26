@@ -2,7 +2,7 @@
 
 require 'yaml'
 
-require 'ext/hash'
+require 'lokalise_manager/utils/hash_utils'
 
 require 'lokalise_manager/version'
 require 'lokalise_manager/error'
