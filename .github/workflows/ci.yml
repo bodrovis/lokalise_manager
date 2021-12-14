@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       LOKALISE_API_TOKEN: 123abc
-      LOKALISE_PROJECT_ID: 456.xyz
+      LOKALISE_PROJECT_ID: 672198945b7d72fc048021.15940510
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
