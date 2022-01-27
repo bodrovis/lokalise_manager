@@ -6,6 +6,9 @@ module LokaliseManager
   module TaskDefinitions
     class Exporter < Base
       using LokaliseManager::Utils::ArrayUtils
+
+      MAX_THREADS = 6
+
       # Performs translation file export to Lokalise and returns an array of queued processes
       #
       # @return [Array]
@@ -14,11 +17,11 @@ module LokaliseManager
 
         queued_processes = []
 
-        all_files.in_groups_of(6) do |files_group|
+        all_files.in_groups_of(MAX_THREADS) do |files_group|
           parallel_upload(files_group).each do |thr|
-            raise_on_fail thr
+            raise_on_fail(thr) if config.raise_on_export_fail
 
-            queued_processes.push thr[:process]
+            queued_processes.push thr
           end
         end
 
@@ -36,19 +39,21 @@ module LokaliseManager
       end
 
       def raise_on_fail(thread)
-        raise thread[:error].class, "Error while trying to upload #{thread[:path]}: #{thread[:error].message}" if thread[:status] == :fail
+        raise(thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}") unless thread.success
       end
 
       # Performs the actual file uploading to Lokalise. If the API rate limit is exceeed,
       # applies exponential backoff
       def do_upload(f_path, r_path)
+        proc_klass = Struct.new(:success, :process, :path, :error, keyword_init: true)
+
         Thread.new do
           process = with_exp_backoff(config.max_retries_export) do
             api_client.upload_file project_id_with_branch, opts(f_path, r_path)
           end
-          {status: :ok, process: process}
+          proc_klass.new success: true, process: process, path: f_path
         rescue StandardError => e
-          {status: :fail, path: f_path, error: e}
+          proc_klass.new success: false, path: f_path, error: e
         end
       end
 

@@ -27,7 +27,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         process = nil
 
         VCR.use_cassette('upload_files_multiple') do
-          expect(-> { process = described_object.export!.first }).to output(/complete!/).to_stdout
+          expect(-> { process = described_object.export!.first.process }).to output(/complete!/).to_stdout
         end
 
         expect(process.project_id).to eq(project_id)
@@ -49,6 +49,28 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         expect(described_object).to have_received(:api_client).at_least(12).times
         expect(fake_client).to have_received(:upload_file).exactly(12).times
       end
+
+      it 'handles too many requests but does not re-raise anything when raise_on_export_fail is false' do
+        allow(described_object.config).to receive(:max_retries_export).and_return(1)
+        allow(described_object.config).to receive(:raise_on_export_fail).and_return(false)
+        allow(described_object).to receive(:sleep).and_return(0)
+
+        fake_client = instance_double('Lokalise::Client')
+        allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
+        allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
+        allow(described_object).to receive(:api_client).and_return(fake_client)
+        processes = []
+        expect(-> { processes = described_object.export! }).not_to raise_error
+
+        expect(processes[0].path.to_s).to include('en_0')
+        expect(processes[0].success).to be false
+        expect(processes[1].error.class).to eq(Lokalise::Error::TooManyRequests)
+        expect(processes.count).to eq(7)
+        
+        expect(described_object).to have_received(:sleep).exactly(7).times
+        expect(described_object).to have_received(:api_client).at_least(14).times
+        expect(fake_client).to have_received(:upload_file).exactly(14).times
+      end
     end
   end
 
@@ -68,7 +90,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         process = nil
 
         VCR.use_cassette('upload_files') do
-          expect(-> { process = described_object.export!.first }).not_to output(/complete!/).to_stdout
+          expect(-> { process = described_object.export!.first.process }).not_to output(/complete!/).to_stdout
         end
 
         expect(process.status).to eq('queued')
@@ -78,7 +100,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       it 'sends a proper API request' do
         process = VCR.use_cassette('upload_files') do
           described_object.export!
-        end.first
+        end.first.process
 
         expect(process.project_id).to eq(project_id)
         expect(process.status).to eq('queued')
@@ -87,11 +109,16 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       it 'sends a proper API request when a different branch is provided' do
         allow(described_object.config).to receive(:branch).and_return('develop')
 
-        process = VCR.use_cassette('upload_files_branch') do
+        process_data = VCR.use_cassette('upload_files_branch') do
           described_object.export!
         end.first
 
         expect(described_object.config).to have_received(:branch).at_most(2).times
+        expect(process_data.success).to be true
+        expect(process_data.path.to_s).to include('en.yml')
+
+        process = process_data.process
+        expect(process).to be_an_instance_of(Lokalise::Resources::QueuedProcess)
         expect(process.project_id).to eq(project_id)
         expect(process.status).to eq('queued')
       end

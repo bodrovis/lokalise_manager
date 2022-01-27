@@ -14,6 +14,11 @@ describe LokaliseManager::GlobalConfig do
     fake_class.project_id = '123.abc'
   end
 
+  it 'is possible to set raise_on_export_fail' do
+    allow(fake_class).to receive(:raise_on_export_fail=).with(false)
+    fake_class.raise_on_export_fail = false
+  end
+
   it 'is possible to set silent_mode' do
     allow(fake_class).to receive(:silent_mode=).with(true)
     fake_class.silent_mode = true

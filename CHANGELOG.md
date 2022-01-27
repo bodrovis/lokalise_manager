@@ -1,5 +1,50 @@
 # Changelog
 
+## 2.1.0
+
+* `export!` will now return an array of objects responding to the following methods:
+  + `success` — usually returns `true` (to learn more, check documentation for the `:raise_on_export_fail` option below)
+  + `process` — returns an object (an instance of the `Lokalise::Resources::QueuedProcess`) representing a [queued background process](https://lokalise.github.io/ruby-lokalise-api/api/queued-processes) as uploading is done in the background on Lokalise.
+  + `path` — returns an instance of the `Pathname` class which represent the file being uploaded.
+* Here's an example:
+
+```ruby
+def uploaded?(process)
+  5.times do # try to check the status 5 times
+    process = process.reload_data # load new data
+    return(true) if process.status == 'finished' # return true is the upload has finished
+    sleep 1 # wait for 1 second, adjust this number with regards to the upload size
+  end
+
+  false # if all 5 checks failed, return false (probably something is wrong)
+end
+
+processes = exporter.export!
+puts "Checking status for the #{processes[0].path} file"
+uploaded? processes[0].process
+```
+
+* Introduced a new option `raise_on_export_fail` (`boolean`) which is `true` by default. When this option is enabled, LokaliseManager will re-raise any exceptions that happened during the file uploading. When this option is disabled, the exporting process will continue even if something goes wrong. In this case you'll probably need to check the result yourself and make the necessary actions. For example:
+
+```ruby
+processes = exporter.export!
+
+processes.each do |proc_data|
+  if proc_data.success
+    # Everything is good, the uploading is queued
+    puts "#{proc_data.path} is sent to Lokalise!"
+    process = proc_data.process
+    puts "Current process status is #{process.status}"
+  else
+    # Something bad has happened
+    puts "Could not send #{proc_data.path} to Lokalise"
+    puts "Error #{proc_data.error.class}: #{proc_data.error.message}"
+    # Or you could re-raise this exception:
+    # raise proc_data.error.class
+  end
+end
+```
+
 ## 2.0.0 (27-Jan-22)
 
 * `export!` method is now taking advantage of multi-threading (as Lokalise API allows to send requests in parallel since January 2022)

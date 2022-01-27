@@ -7,11 +7,17 @@ module LokaliseManager
       attr_writer :import_opts, :import_safe_mode, :export_opts, :locales_path,
                   :file_ext_regexp, :skip_file_export, :branch, :timeouts,
                   :translations_loader, :translations_converter, :lang_iso_inferer,
-                  :max_retries_export, :max_retries_import, :use_oauth2_token, :silent_mode
+                  :max_retries_export, :max_retries_import, :use_oauth2_token, :silent_mode,
+                  :raise_on_export_fail
 
       # Main interface to provide configuration options
       def config
         yield self
+      end
+
+      # When enabled, will re-raise any exception that happens during file exporting
+      def raise_on_export_fail
+        @raise_on_export_fail || true
       end
 
       # When enabled, won't print any debugging info to $stdout
