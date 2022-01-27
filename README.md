@@ -65,6 +65,8 @@ To upload your translation files from a local directory (defaults to `locales/`)
 processes = exporter.export!
 ```
 
+The uploading process is multi-threaded.
+
 `processes` will contain an array of objects responding to the following methods:
 
 * `success` — usually returns `true` (to learn more, check documentation for the `:raise_on_export_fail` option below)
