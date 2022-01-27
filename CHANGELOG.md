@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.0 (27-Jan-22)
+
+* `export!` method is now taking advantage of multi-threading (as Lokalise API allows to send requests in parallel since January 2022)
+* Test with Ruby 3.1.0
+* Other minor fixes
+
 ## 1.2.1 (26-Nov-21)
 
 * Use refinements instead of monkey patching to add hash methods

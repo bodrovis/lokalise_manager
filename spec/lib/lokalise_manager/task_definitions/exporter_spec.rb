@@ -35,17 +35,19 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       end
 
       it 'handles too many requests' do
+        allow(described_object.config).to receive(:max_retries_export).and_return(1)
         allow(described_object).to receive(:sleep).and_return(0)
 
         fake_client = instance_double('Lokalise::Client')
+        allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
         allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
         allow(described_object).to receive(:api_client).and_return(fake_client)
 
-        expect(-> { described_object.export! }).to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 2 retries/i)
+        expect(-> { described_object.export! }).to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 1 retries/i)
 
-        expect(described_object).to have_received(:sleep).exactly(2).times
-        expect(described_object).to have_received(:api_client).exactly(3).times
-        expect(fake_client).to have_received(:upload_file).exactly(3).times
+        expect(described_object).to have_received(:sleep).exactly(6).times
+        expect(described_object).to have_received(:api_client).at_least(12).times
+        expect(fake_client).to have_received(:upload_file).exactly(12).times
       end
     end
   end
@@ -108,9 +110,9 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       end
     end
 
-    describe '.each_file' do
+    describe '#all_files' do
       it 'yield proper arguments' do
-        expect { |b| described_object.send(:each_file, &b) }.to yield_with_args(
+        expect(described_object.send(:all_files).first).to include(
           Pathname.new(path),
           Pathname.new(relative_name)
         )
@@ -180,30 +182,29 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       end
     end
 
-    describe '.each_file' do
-      it 'yields every translation file' do
-        expect { |b| described_object.send(:each_file, &b) }.to yield_successive_args(
-          [
-            Pathname.new(path),
-            Pathname.new(relative_name)
-          ],
-          [
-            Pathname.new(path_ru),
-            Pathname.new(filename_ru)
-          ]
+    describe '#each_file' do
+      it 'returns all files' do
+        files = described_object.send(:all_files)
+        expect(files[0]).to include(
+          Pathname.new(path),
+          Pathname.new(relative_name)
+        )
+        expect(files[1]).to include(
+          Pathname.new(path_ru),
+          Pathname.new(filename_ru)
         )
       end
 
-      it 'does not yield files that have to be skipped' do
+      it 'does not return files that have to be skipped' do
         allow(described_object.config).to receive(:skip_file_export).twice.and_return(
           ->(f) { f.split[1].to_s.include?('ru') }
         )
-        expect { |b| described_object.send(:each_file, &b) }.to yield_successive_args(
-          [
-            Pathname.new(path),
-            Pathname.new(relative_name)
-          ]
+        files = described_object.send(:all_files)
+        expect(files[0]).to include(
+          Pathname.new(path),
+          Pathname.new(relative_name)
         )
+        expect(files.count).to eq(1)
 
         expect(described_object.config).to have_received(:skip_file_export).twice
       end

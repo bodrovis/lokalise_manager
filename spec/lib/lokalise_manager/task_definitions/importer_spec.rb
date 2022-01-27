@@ -111,9 +111,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
         expect(result).to be true
 
-        expect(count_translations).to eq(8)
-        expect_file_exist loc_path, 'en.yml'
-        expect_file_exist loc_path, 'ru.yml'
+        expect(count_translations).to eq(24)
+        expect_file_exist loc_path, 'en_1.yml'
+        expect_file_exist loc_path, 'ru_2.yml'
       end
 
       it 'runs import successfully but does not provide any output when silent_mode is enabled' do
@@ -125,8 +125,8 @@ describe LokaliseManager::TaskDefinitions::Importer do
         end
 
         expect(result).to be true
-        expect_file_exist loc_path, 'en.yml'
-        expect_file_exist loc_path, 'ru.yml'
+        expect_file_exist loc_path, 'en_1.yml'
+        expect_file_exist loc_path, 'ru_2.yml'
         expect(described_object.config).to have_received(:silent_mode).at_most(1).times
       end
     end

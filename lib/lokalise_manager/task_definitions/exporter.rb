@@ -5,6 +5,7 @@ require 'base64'
 module LokaliseManager
   module TaskDefinitions
     class Exporter < Base
+      using LokaliseManager::Utils::ArrayUtils
       # Performs translation file export to Lokalise and returns an array of queued processes
       #
       # @return [Array]
@@ -12,10 +13,13 @@ module LokaliseManager
         check_options_errors!
 
         queued_processes = []
-        each_file do |full_path, relative_path|
-          queued_processes << do_upload(full_path, relative_path)
-        rescue StandardError => e
-          raise e.class, "Error while trying to upload #{full_path}: #{e.message}"
+
+        all_files.in_groups_of(6) do |files_group|
+          parallel_upload(files_group).each do |thr|
+            raise_on_fail thr
+
+            queued_processes.push thr[:process]
+          end
         end
 
         $stdout.print('Task complete!') unless config.silent_mode
@@ -25,18 +29,32 @@ module LokaliseManager
 
       private
 
+      def parallel_upload(files_group)
+        files_group.compact.map do |file_data|
+          do_upload(*file_data)
+        end.map(&:value)
+      end
+
+      def raise_on_fail(thread)
+        raise thread[:error].class, "Error while trying to upload #{thread[:path]}: #{thread[:error].message}" if thread[:status] == :fail
+      end
+
       # Performs the actual file uploading to Lokalise. If the API rate limit is exceeed,
       # applies exponential backoff
       def do_upload(f_path, r_path)
-        with_exp_backoff(config.max_retries_export) do
-          api_client.upload_file project_id_with_branch, opts(f_path, r_path)
+        Thread.new do
+          process = with_exp_backoff(config.max_retries_export) do
+            api_client.upload_file project_id_with_branch, opts(f_path, r_path)
+          end
+          {status: :ok, process: process}
+        rescue StandardError => e
+          {status: :fail, path: f_path, error: e}
         end
       end
 
-      # Processes each translation file in the specified directory
-      def each_file
-        return unless block_given?
-
+      # Gets translation files from the specified directory
+      def all_files
+        files = []
         loc_path = config.locales_path
         Dir["#{loc_path}/**/*"].sort.each do |f|
           full_path = Pathname.new f
@@ -45,8 +63,9 @@ module LokaliseManager
 
           relative_path = full_path.relative_path_from Pathname.new(loc_path)
 
-          yield full_path, relative_path
+          files << [full_path, relative_path]
         end
+        files
       end
 
       # Generates export options

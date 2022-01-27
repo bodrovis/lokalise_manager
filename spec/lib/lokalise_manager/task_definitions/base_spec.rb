@@ -24,7 +24,7 @@ describe LokaliseManager::TaskDefinitions::Base do
   specify '.reset_client!' do
     expect(described_object.api_client).to be_an_instance_of(Lokalise::Client)
     described_object.reset_api_client!
-    current_client = described_object.instance_variable_get '@api_client'
+    current_client = described_object.instance_variable_get :@api_client
     expect(current_client).to be_nil
   end
 

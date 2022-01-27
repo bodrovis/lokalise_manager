@@ -10,8 +10,8 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
+      - ruby-lokalise-api gem/4.5.1
+      x-api-token:
       - "<LOKALISE_TOKEN>"
       Accept-Encoding:
       - gzip,deflate,br
@@ -23,7 +23,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Thu, 14 Oct 2021 12:34:15 GMT
+      - Thu, 27 Jan 2022 16:55:41 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -46,8 +46,10 @@ http_interactions:
       - max-age=31536000
       referrer-policy:
       - origin
+      x-lokalise-process-id:
+      - e0feae32-9fa8-463e-8463-26304811343d
       expires:
-      - Thu, 14 Oct 2021 12:34:15 GMT
+      - Thu, 27 Jan 2022 16:55:41 GMT
       access-control-allow-origin:
       - "*"
       access-control-allow-headers:
@@ -57,6 +59,6 @@ http_interactions:
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        H4sIAAAAAAAEA4WPS27DIBRF98I4GHDAhIy7gKpjJIvPQ6HFxuJhpUrVvcdZQUZHOjqDe//I1uo3hD7nSK5k0qMwFyOV11GPKXB54aMYhDKSK8HJifjm1nA70sVhh/Yy+xoLzHsrh731vuHVMsvwTGGnd8BOxeAW96iru+MQ6mJZqT+uZATqEKGjZSkXOAC/W23dsjczLAuT8txwkybuY5IaYtR6NGeQflJgkmUfsNT5y+WC8+fxkJYaXIHhkTfy/wQMST6c9QAAAA==
-  recorded_at: Thu, 14 Oct 2021 12:34:15 GMT
+        H4sIAAAAAAAEA4WPS27DIBRF98K45meMccZdQJUxkvWCHwotNhYPK1Gq7r3uCjo60tEZ3PvN9lo+MbQ5LezC7KjV5CYz3MZl1DFI46RWXA2TkYOS7I3dKmzhfqYrUMP6Z45tyTgfNZ/23tpOFy+8oJ7j0T2QWqc4rPAqGzyIh7J6kcsX5ETYARE28iKmjCfwuZfavPhnhhcSwfSjdRKDxuBc1BECxl7ZMNlgrBfvuJb5CinT/HE+7HIJkJG/0s5+fgHytEpI9QAAAA==
+  recorded_at: Thu, 27 Jan 2022 16:55:41 GMT
 recorded_with: VCR 6.0.0

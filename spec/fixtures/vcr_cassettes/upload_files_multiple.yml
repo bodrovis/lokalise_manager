@@ -5,66 +5,13 @@ http_interactions:
     uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
-      string: '{"data":"LS0tCmVuOgogIGtleV8wOiB2YWx1ZSAw","filename":"en_0.yml","lang_iso":"en"}'
-    headers:
-      Accept:
-      - application/json
-      User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
-      - "<LOKALISE_TOKEN>"
-      Accept-Encoding:
-      - gzip,deflate,br
-  response:
-    status:
-      code: 202
-      message: Accepted
-    headers:
-      server:
-      - nginx
-      date:
-      - Thu, 14 Oct 2021 12:34:17 GMT
-      content-type:
-      - application/json
-      transfer-encoding:
-      - chunked
-      connection:
-      - keep-alive
-      cache-control:
-      - max-age=0, must-revalidate, no-cache, no-store, private
-      location:
-      - "/api2/projects/672198945b7d72fc048021.15940510/processes/4be1d9b531dde3ce452105be04ac0811e48ca9c8"
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
-      x-frame-options:
-      - deny
-      x-xss-protection:
-      - 1; mode=block
-      strict-transport-security:
-      - max-age=31536000
-      referrer-policy:
-      - origin
-      expires:
-      - Thu, 14 Oct 2021 12:34:17 GMT
-    body:
-      encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"4be1d9b531dde3ce452105be04ac0811e48ca9c8","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
-        12:34:17 (Etc\/UTC)","created_at_timestamp":1634214857}}'
-  recorded_at: Thu, 14 Oct 2021 12:34:18 GMT
-- request:
-    method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
-    body:
-      encoding: UTF-8
       string: '{"data":"LS0tCmVuOgogIGtleV8xOiB2YWx1ZSAx","filename":"en_1.yml","lang_iso":"en"}'
     headers:
       Accept:
       - application/json
       User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
+      - ruby-lokalise-api gem/4.5.0
+      x-api-token:
       - "<LOKALISE_TOKEN>"
       Accept-Encoding:
       - gzip,deflate,br
@@ -76,7 +23,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Thu, 14 Oct 2021 12:34:18 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -86,7 +33,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510/processes/ac2d4b202abfb2978b7cf0e498f43380e5455d0c"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/3452ecf1652723b8fec8320e6fd8f7e0f008e8e7"
       pragma:
       - no-cache
       x-content-type-options:
@@ -99,25 +46,27 @@ http_interactions:
       - max-age=31536000
       referrer-policy:
       - origin
+      x-lokalise-process-id:
+      - 500bac42-61bc-4826-88b7-93f2714d5589
       expires:
-      - Thu, 14 Oct 2021 12:34:18 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"ac2d4b202abfb2978b7cf0e498f43380e5455d0c","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
-        12:34:18 (Etc\/UTC)","created_at_timestamp":1634214858}}'
-  recorded_at: Thu, 14 Oct 2021 12:34:19 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"3452ecf1652723b8fec8320e6fd8f7e0f008e8e7","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2022-01-27
+        16:12:09 (Etc\/UTC)","created_at_timestamp":1643299929}}'
+  recorded_at: Thu, 27 Jan 2022 16:12:09 GMT
 - request:
     method: post
     uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
     body:
       encoding: UTF-8
-      string: '{"data":"LS0tCmVuOgogIGtleV8yOiB2YWx1ZSAy","filename":"en_2.yml","lang_iso":"en"}'
+      string: '{"data":"LS0tCmVuOgogIGtleV8wOiB2YWx1ZSAw","filename":"en_0.yml","lang_iso":"en"}'
     headers:
       Accept:
       - application/json
       User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
+      - ruby-lokalise-api gem/4.5.0
+      x-api-token:
       - "<LOKALISE_TOKEN>"
       Accept-Encoding:
       - gzip,deflate,br
@@ -129,7 +78,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Thu, 14 Oct 2021 12:34:19 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -139,7 +88,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510/processes/91810f63d1bb1fa536854a4650f6abdebdcddbf1"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/c69094177105260a2757c9bd9d9e87a34dfc9320"
       pragma:
       - no-cache
       x-content-type-options:
@@ -152,66 +101,15 @@ http_interactions:
       - max-age=31536000
       referrer-policy:
       - origin
+      x-lokalise-process-id:
+      - 6d637808-e321-469a-9f68-af704c53e5e7
       expires:
-      - Thu, 14 Oct 2021 12:34:19 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"91810f63d1bb1fa536854a4650f6abdebdcddbf1","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
-        12:34:19 (Etc\/UTC)","created_at_timestamp":1634214859}}'
-  recorded_at: Thu, 14 Oct 2021 12:34:19 GMT
-- request:
-    method: post
-    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
-    body:
-      encoding: UTF-8
-      string: '{"data":"LS0tCmVuOgogIGtleV8zOiB2YWx1ZSAz","filename":"en_3.yml","lang_iso":"en"}'
-    headers:
-      Accept:
-      - application/json
-      User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
-      - "<LOKALISE_TOKEN>"
-      Accept-Encoding:
-      - gzip,deflate,br
-  response:
-    status:
-      code: 202
-      message: Accepted
-    headers:
-      server:
-      - nginx
-      date:
-      - Thu, 14 Oct 2021 12:34:20 GMT
-      content-type:
-      - application/json
-      transfer-encoding:
-      - chunked
-      connection:
-      - keep-alive
-      cache-control:
-      - max-age=0, must-revalidate, no-cache, no-store, private
-      location:
-      - "/api2/projects/672198945b7d72fc048021.15940510/processes/50ec7617c1c1d66bb63f998c318092f298430f69"
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
-      x-frame-options:
-      - deny
-      x-xss-protection:
-      - 1; mode=block
-      strict-transport-security:
-      - max-age=31536000
-      referrer-policy:
-      - origin
-      expires:
-      - Thu, 14 Oct 2021 12:34:20 GMT
-    body:
-      encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"50ec7617c1c1d66bb63f998c318092f298430f69","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
-        12:34:20 (Etc\/UTC)","created_at_timestamp":1634214860}}'
-  recorded_at: Thu, 14 Oct 2021 12:34:20 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"c69094177105260a2757c9bd9d9e87a34dfc9320","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2022-01-27
+        16:12:09 (Etc\/UTC)","created_at_timestamp":1643299929}}'
+  recorded_at: Thu, 27 Jan 2022 16:12:09 GMT
 - request:
     method: post
     uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
@@ -222,8 +120,8 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
+      - ruby-lokalise-api gem/4.5.0
+      x-api-token:
       - "<LOKALISE_TOKEN>"
       Accept-Encoding:
       - gzip,deflate,br
@@ -235,7 +133,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Thu, 14 Oct 2021 12:34:20 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -245,7 +143,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510/processes/17a7c1260e914d81575931221b65c728d38558a1"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/7583a2e208ea3f3c1136664ba802f499af5d8880"
       pragma:
       - no-cache
       x-content-type-options:
@@ -258,13 +156,15 @@ http_interactions:
       - max-age=31536000
       referrer-policy:
       - origin
+      x-lokalise-process-id:
+      - 8d71946b-4434-4f50-86e4-5739a881210c
       expires:
-      - Thu, 14 Oct 2021 12:34:20 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"17a7c1260e914d81575931221b65c728d38558a1","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
-        12:34:20 (Etc\/UTC)","created_at_timestamp":1634214860}}'
-  recorded_at: Thu, 14 Oct 2021 12:34:21 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"7583a2e208ea3f3c1136664ba802f499af5d8880","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2022-01-27
+        16:12:09 (Etc\/UTC)","created_at_timestamp":1643299929}}'
+  recorded_at: Thu, 27 Jan 2022 16:12:09 GMT
 - request:
     method: post
     uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
@@ -275,8 +175,8 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
+      - ruby-lokalise-api gem/4.5.0
+      x-api-token:
       - "<LOKALISE_TOKEN>"
       Accept-Encoding:
       - gzip,deflate,br
@@ -288,7 +188,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Thu, 14 Oct 2021 12:34:21 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -298,7 +198,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510/processes/1cb5656120d87324cf3fd6908d215a94e9c4500d"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/b85ed5ed89ef6369e4bc40c8d56a958a145d88cf"
       pragma:
       - no-cache
       x-content-type-options:
@@ -311,13 +211,125 @@ http_interactions:
       - max-age=31536000
       referrer-policy:
       - origin
+      x-lokalise-process-id:
+      - 762cb9dc-c3b3-4de6-903c-e39bae82ea4c
       expires:
-      - Thu, 14 Oct 2021 12:34:21 GMT
+      - Thu, 27 Jan 2022 16:12:09 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"1cb5656120d87324cf3fd6908d215a94e9c4500d","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
-        12:34:21 (Etc\/UTC)","created_at_timestamp":1634214861}}'
-  recorded_at: Thu, 14 Oct 2021 12:34:21 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"b85ed5ed89ef6369e4bc40c8d56a958a145d88cf","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2022-01-27
+        16:12:09 (Etc\/UTC)","created_at_timestamp":1643299929}}'
+  recorded_at: Thu, 27 Jan 2022 16:12:09 GMT
+- request:
+    method: post
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
+    body:
+      encoding: UTF-8
+      string: '{"data":"LS0tCmVuOgogIGtleV8zOiB2YWx1ZSAz","filename":"en_3.yml","lang_iso":"en"}'
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - ruby-lokalise-api gem/4.5.0
+      x-api-token:
+      - "<LOKALISE_TOKEN>"
+      Accept-Encoding:
+      - gzip,deflate,br
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      server:
+      - nginx
+      date:
+      - Thu, 27 Jan 2022 16:12:09 GMT
+      content-type:
+      - application/json
+      transfer-encoding:
+      - chunked
+      connection:
+      - keep-alive
+      cache-control:
+      - max-age=0, must-revalidate, no-cache, no-store, private
+      location:
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/4f2d675f6210a40717f5ebbe40b865bdab7e8d3f"
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - deny
+      x-xss-protection:
+      - 1; mode=block
+      strict-transport-security:
+      - max-age=31536000
+      referrer-policy:
+      - origin
+      x-lokalise-process-id:
+      - 50863477-b6b0-46a2-bfc1-000732e47a75
+      expires:
+      - Thu, 27 Jan 2022 16:12:09 GMT
+    body:
+      encoding: UTF-8
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"4f2d675f6210a40717f5ebbe40b865bdab7e8d3f","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2022-01-27
+        16:12:09 (Etc\/UTC)","created_at_timestamp":1643299929}}'
+  recorded_at: Thu, 27 Jan 2022 16:12:10 GMT
+- request:
+    method: post
+    uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
+    body:
+      encoding: UTF-8
+      string: '{"data":"LS0tCmVuOgogIGtleV8yOiB2YWx1ZSAy","filename":"en_2.yml","lang_iso":"en"}'
+    headers:
+      Accept:
+      - application/json
+      User-Agent:
+      - ruby-lokalise-api gem/4.5.0
+      x-api-token:
+      - "<LOKALISE_TOKEN>"
+      Accept-Encoding:
+      - gzip,deflate,br
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      server:
+      - nginx
+      date:
+      - Thu, 27 Jan 2022 16:12:13 GMT
+      content-type:
+      - application/json
+      transfer-encoding:
+      - chunked
+      connection:
+      - keep-alive
+      cache-control:
+      - max-age=0, must-revalidate, no-cache, no-store, private
+      location:
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/46f28f2e8cd5f67cf65f3851bd84c8d53d1916db"
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - deny
+      x-xss-protection:
+      - 1; mode=block
+      strict-transport-security:
+      - max-age=31536000
+      referrer-policy:
+      - origin
+      x-lokalise-process-id:
+      - 40ed9a91-7b36-412b-a35f-f0b52c0e0f43
+      expires:
+      - Thu, 27 Jan 2022 16:12:13 GMT
+    body:
+      encoding: UTF-8
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"46f28f2e8cd5f67cf65f3851bd84c8d53d1916db","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2022-01-27
+        16:12:09 (Etc\/UTC)","created_at_timestamp":1643299929}}'
+  recorded_at: Thu, 27 Jan 2022 16:12:13 GMT
 - request:
     method: post
     uri: https://api.lokalise.com/api2/projects/672198945b7d72fc048021.15940510/files/upload
@@ -328,8 +340,8 @@ http_interactions:
       Accept:
       - application/json
       User-Agent:
-      - ruby-lokalise-api gem/4.3.1
-      X-api-token:
+      - ruby-lokalise-api gem/4.5.0
+      x-api-token:
       - "<LOKALISE_TOKEN>"
       Accept-Encoding:
       - gzip,deflate,br
@@ -341,7 +353,7 @@ http_interactions:
       server:
       - nginx
       date:
-      - Thu, 14 Oct 2021 12:34:22 GMT
+      - Thu, 27 Jan 2022 16:12:14 GMT
       content-type:
       - application/json
       transfer-encoding:
@@ -351,7 +363,7 @@ http_interactions:
       cache-control:
       - max-age=0, must-revalidate, no-cache, no-store, private
       location:
-      - "/api2/projects/672198945b7d72fc048021.15940510/processes/4ea4755620af985b7d20ce05ec0dc683b24639b0"
+      - "/api2/projects/672198945b7d72fc048021.15940510/processes/77ac96109af1ee31884ca5126f6ab1556d0b39f3"
       pragma:
       - no-cache
       x-content-type-options:
@@ -364,11 +376,13 @@ http_interactions:
       - max-age=31536000
       referrer-policy:
       - origin
+      x-lokalise-process-id:
+      - c92275b3-8bd9-4883-addb-6124719bac69
       expires:
-      - Thu, 14 Oct 2021 12:34:22 GMT
+      - Thu, 27 Jan 2022 16:12:14 GMT
     body:
       encoding: UTF-8
-      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"4ea4755620af985b7d20ce05ec0dc683b24639b0","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2021-10-14
-        12:34:22 (Etc\/UTC)","created_at_timestamp":1634214862}}'
-  recorded_at: Thu, 14 Oct 2021 12:34:22 GMT
+      string: '{"project_id":"672198945b7d72fc048021.15940510","branch":"master","process":{"process_id":"77ac96109af1ee31884ca5126f6ab1556d0b39f3","type":"file-import","status":"queued","message":"","created_by":20181,"created_by_email":"bodrovis@protonmail.com","created_at":"2022-01-27
+        16:12:14 (Etc\/UTC)","created_at_timestamp":1643299934}}'
+  recorded_at: Thu, 27 Jan 2022 16:12:14 GMT
 recorded_with: VCR 6.0.0
