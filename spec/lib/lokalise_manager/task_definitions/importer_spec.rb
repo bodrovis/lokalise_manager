@@ -9,12 +9,16 @@ describe LokaliseManager::TaskDefinitions::Importer do
   let(:loc_path) { described_object.config.locales_path }
   let(:project_id) { ENV['LOKALISE_PROJECT_ID'] }
   let(:local_trans) { "#{Dir.getwd}/spec/fixtures/trans.zip" }
-  let(:faulty_trans) { "#{Dir.getwd}/spec/fixtures/faulty_trans.zip" }
 
-  describe '.open_and_process_zip' do
+  describe '#open_and_process_zip' do
     it 're-raises errors during file processing' do
-      expect(-> { described_object.send(:open_and_process_zip, faulty_trans) }).
-        to raise_error(Psych::DisallowedClass, /Error when trying to process fail\.yml/)
+      entry = double
+      allow(entry).to receive(:name).and_return('fail.yml')
+      allow(described_object).to receive(:data_from).with(entry).and_raise(EncodingError)
+      expect(-> { described_object.send(:process!, entry) }).
+        to raise_error(EncodingError, /Error when trying to process fail\.yml/)
+
+      expect(described_object).to have_received(:data_from)
     end
 
     it 're-raises errors during file opening' do
@@ -23,7 +27,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
     end
   end
 
-  describe '.download_files' do
+  describe '#download_files' do
     it 'returns a proper download URL' do
       response = VCR.use_cassette('download_files') do
         described_object.send :download_files
