@@ -66,7 +66,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         expect(processes[0].success).to be false
         expect(processes[1].error.class).to eq(Lokalise::Error::TooManyRequests)
         expect(processes.count).to eq(7)
-        
+
         expect(described_object).to have_received(:sleep).exactly(7).times
         expect(described_object).to have_received(:api_client).at_least(14).times
         expect(fake_client).to have_received(:upload_file).exactly(14).times

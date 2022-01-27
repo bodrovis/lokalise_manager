@@ -1,10 +1,10 @@
 # Changelog
 
-## 2.1.0
+## 2.1.0 (27-Jan-22)
 
-* `export!` will now return an array of objects responding to the following methods:
+* **Breaking change**: `export!` will now return an array of objects responding to the following methods:
   + `success` — usually returns `true` (to learn more, check documentation for the `:raise_on_export_fail` option below)
-  + `process` — returns an object (an instance of the `Lokalise::Resources::QueuedProcess`) representing a [queued background process](https://lokalise.github.io/ruby-lokalise-api/api/queued-processes) as uploading is done in the background on Lokalise.
+  + `process` — returns an object (an instance of the `Lokalise::Resources::QueuedProcess`) representing a [queued background process](https://lokalise.github.io/ruby-lokalise-api/api/queued-processes) as uploading is done in the background on Lokalise. You can use this object to check the process status (whether the uploading is completed or not).
   + `path` — returns an instance of the `Pathname` class which represent the file being uploaded.
 * Here's an example:
 
