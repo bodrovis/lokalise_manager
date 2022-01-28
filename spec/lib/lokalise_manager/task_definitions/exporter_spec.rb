@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'base64'
-
+require 'pry'
 describe LokaliseManager::TaskDefinitions::Exporter do
   let(:filename) { 'en.yml' }
   let(:path) { "#{Dir.getwd}/locales/nested/#{filename}" }
@@ -209,7 +209,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       end
     end
 
-    describe '#each_file' do
+    describe '#all_files' do
       it 'returns all files' do
         files = described_object.send(:all_files)
         expect(files[0]).to include(

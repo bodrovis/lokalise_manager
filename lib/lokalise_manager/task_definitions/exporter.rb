@@ -34,7 +34,7 @@ module LokaliseManager
       private
 
       def parallel_upload(files_group)
-        files_group.compact.map do |file_data|
+        files_group.map do |file_data|
           do_upload(*file_data)
         end.map(&:value)
       end
@@ -60,18 +60,16 @@ module LokaliseManager
 
       # Gets translation files from the specified directory
       def all_files
-        files = []
         loc_path = config.locales_path
-        Dir["#{loc_path}/**/*"].sort.each do |f|
+        Dir["#{loc_path}/**/*"].map do |f|
           full_path = Pathname.new f
 
           next unless file_matches_criteria? full_path
 
           relative_path = full_path.relative_path_from Pathname.new(loc_path)
 
-          files << [full_path, relative_path]
-        end
-        files
+          [full_path, relative_path]
+        end.compact
       end
 
       # Generates export options
