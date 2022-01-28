@@ -43,7 +43,7 @@ importer = LokaliseManager.importer api_token: '1234abc', project_id: '123.abc'
 exporter = LokaliseManager.exporter api_token: '1234abc', project_id: '123.abc'
 ```
 
-You *must* provide an API token and a project ID (your project ID can be found under Lokalise project settings). [Other options can be customized as well (see below)](https://github.com/bodrovis/lokalise_manager#configuration) but they have sensible defaults.
+You *must* provide an API token and a project ID (your project ID can be found under Lokalise project settings). [Other options can be customized as well (see below)](#configuration) but they have sensible defaults.
 
 ### Importing files from Lokalise into your project
 
@@ -55,7 +55,7 @@ result = importer.import!
 
 The `result` will contain a boolean value which says whether the operation was successfull or not.
 
-Please note that upon importing translations any duplicating files inside the `locales` directory (or any other directory that you've specified in the options) will be overwritten! You can enable [safe mode](https://github.com/bodrovis/lokalise_manager#import-config) to check whether the folder is empty or not.
+Please note that upon importing translations any duplicating files inside the `locales` directory (or any other directory that you've specified in the options) **will be overwritten**! You can enable [safe mode](#import-config) to check whether the folder is empty or not.
 
 ### Exporting files from your project to Lokalise
 
@@ -69,17 +69,17 @@ The uploading process is multi-threaded.
 
 `processes` will contain an array of objects responding to the following methods:
 
-* `success` — usually returns `true` (to learn more, check documentation for the `:raise_on_export_fail` option below)
-* `process` — returns an object (an instance of the `Lokalise::Resources::QueuedProcess`) representing a [queued background process](https://lokalise.github.io/ruby-lokalise-api/api/queued-processes) as uploading is done in the background on Lokalise.
-* `path` — returns an instance of the `Pathname` class which represent the file being uploaded.
+* `#success` — usually returns `true` (to learn more, check documentation for the `:raise_on_export_fail` option below)
+* `#process` — returns an object (an instance of the `Lokalise::Resources::QueuedProcess`) representing a [queued background process](https://lokalise.github.io/ruby-lokalise-api/api/queued-processes) as uploading is done in the background on Lokalise.
+* `#path` — returns an instance of the `Pathname` class which represent the file being uploaded.
 
 You can perform periodic checks to read the status of the process. Here's a very simple example:
 
 ```ruby
 def uploaded?(process)
   5.times do # try to check the status 5 times
-    process = process.reload_data # load new data
-    return(true) if process.status == 'finished' # return true is the upload has finished
+    process = process.reload_data # load new info about this process
+    return(true) if process.status == 'finished' # return true if the upload has finished
     sleep 1 # wait for 1 second, adjust this number with regards to the upload size
   end
 

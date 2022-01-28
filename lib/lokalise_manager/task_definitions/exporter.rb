@@ -7,6 +7,7 @@ module LokaliseManager
     class Exporter < Base
       using LokaliseManager::Utils::ArrayUtils
 
+      # Lokalise allows no more than 6 requests per second
       MAX_THREADS = 6
 
       # Performs translation file export to Lokalise and returns an array of queued processes
@@ -17,7 +18,7 @@ module LokaliseManager
 
         queued_processes = []
 
-        all_files.in_groups_of(MAX_THREADS) do |files_group|
+        all_files.each_slice(MAX_THREADS) do |files_group|
           parallel_upload(files_group).each do |thr|
             raise_on_fail(thr) if config.raise_on_export_fail
 
