@@ -139,7 +139,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
     describe '#all_files' do
       it 'yield proper arguments' do
-        expect(described_object.send(:all_files).first).to include(
+        expect(described_object.send(:all_files).sort.first).to include(
           Pathname.new(path),
           Pathname.new(relative_name)
         )
@@ -211,7 +211,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
     describe '#all_files' do
       it 'returns all files' do
-        files = described_object.send(:all_files)
+        files = described_object.send(:all_files).sort
         expect(files[0]).to include(
           Pathname.new(path),
           Pathname.new(relative_name)
@@ -226,7 +226,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         allow(described_object.config).to receive(:skip_file_export).twice.and_return(
           ->(f) { f.split[1].to_s.include?('ru') }
         )
-        files = described_object.send(:all_files)
+        files = described_object.send(:all_files).sort
         expect(files[0]).to include(
           Pathname.new(path),
           Pathname.new(relative_name)
