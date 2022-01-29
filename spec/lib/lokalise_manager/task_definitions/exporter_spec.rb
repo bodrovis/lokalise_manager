@@ -62,7 +62,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         processes = []
         expect(-> { processes = described_object.export! }).not_to raise_error
 
-        expect(processes[0].path.to_s).to include('en_0')
+        expect(processes[0].path.to_s).to include('en_')
         expect(processes[0].success).to be false
         expect(processes[1].error.class).to eq(Lokalise::Error::TooManyRequests)
         expect(processes.count).to eq(7)
@@ -139,7 +139,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
     describe '#all_files' do
       it 'yield proper arguments' do
-        expect(described_object.send(:all_files).sort.first).to include(
+        expect(described_object.send(:all_files).flatten).to include(
           Pathname.new(path),
           Pathname.new(relative_name)
         )
@@ -211,12 +211,12 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
     describe '#all_files' do
       it 'returns all files' do
-        files = described_object.send(:all_files).sort
-        expect(files[0]).to include(
+        files = described_object.send(:all_files).flatten
+        expect(files).to include(
           Pathname.new(path),
           Pathname.new(relative_name)
         )
-        expect(files[1]).to include(
+        expect(files).to include(
           Pathname.new(path_ru),
           Pathname.new(filename_ru)
         )
