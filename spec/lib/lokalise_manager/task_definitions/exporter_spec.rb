@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'base64'
-require 'pry'
+
 describe LokaliseManager::TaskDefinitions::Exporter do
   let(:filename) { 'en.yml' }
   let(:path) { "#{Dir.getwd}/locales/nested/#{filename}" }
