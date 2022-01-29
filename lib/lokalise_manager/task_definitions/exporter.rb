@@ -5,8 +5,6 @@ require 'base64'
 module LokaliseManager
   module TaskDefinitions
     class Exporter < Base
-      using LokaliseManager::Utils::ArrayUtils
-
       # Lokalise allows no more than 6 requests per second
       MAX_THREADS = 6
 

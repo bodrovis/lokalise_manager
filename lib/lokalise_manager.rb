@@ -3,7 +3,6 @@
 require 'yaml'
 
 require 'lokalise_manager/utils/hash_utils'
-require 'lokalise_manager/utils/array_utils'
 
 require 'lokalise_manager/version'
 require 'lokalise_manager/error'
