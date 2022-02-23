@@ -63,14 +63,14 @@ describe LokaliseManager::TaskDefinitions::Base do
     it 'raises an error when the API key is not set' do
       allow(LokaliseManager::GlobalConfig).to receive(:api_token).and_return(nil)
 
-      expect(-> { described_object.send(:check_options_errors!) }).to raise_error(LokaliseManager::Error, /API token is not set/i)
+      expect { described_object.send(:check_options_errors!) }.to raise_error(LokaliseManager::Error, /API token is not set/i)
 
       expect(LokaliseManager::GlobalConfig).to have_received(:api_token)
     end
 
     it 'returns an error when the project_id is not set' do
       allow_project_id described_object, nil do
-        expect(-> { described_object.send(:check_options_errors!) }).to raise_error(LokaliseManager::Error, /ID is not set/i)
+        expect { described_object.send(:check_options_errors!) }.to raise_error(LokaliseManager::Error, /ID is not set/i)
       end
     end
   end
@@ -96,7 +96,7 @@ describe LokaliseManager::TaskDefinitions::Base do
 
       client = described_object.api_client
       expect(client).to be_an_instance_of(Lokalise::Client)
-      expect(client).not_to be_an_instance_of(Lokalise::OAuthClient)
+      expect(client).not_to be_an_instance_of(Lokalise::OAuth2Client)
       expect(client.open_timeout).to eq(100)
       expect(client.timeout).to eq(500)
     end
@@ -106,7 +106,7 @@ describe LokaliseManager::TaskDefinitions::Base do
 
       client = described_object.api_client
 
-      expect(client).to be_an_instance_of(Lokalise::OAuthClient)
+      expect(client).to be_an_instance_of(Lokalise::OAuth2Client)
       expect(client).not_to be_an_instance_of(Lokalise::Client)
     end
   end

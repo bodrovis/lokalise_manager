@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0 (23-Feb-22)
+
+* Use ruby-lokalise-api v5
+* Don't use any compression options (compression is now enabled by default)
+* Update tests
+
 ## 2.1.0 (27-Jan-22)
 
 * **Breaking change**: `export!` will now return an array of objects responding to the following methods:

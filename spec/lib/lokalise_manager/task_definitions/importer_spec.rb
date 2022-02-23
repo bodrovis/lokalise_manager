@@ -15,14 +15,14 @@ describe LokaliseManager::TaskDefinitions::Importer do
       entry = double
       allow(entry).to receive(:name).and_return('fail.yml')
       allow(described_object).to receive(:data_from).with(entry).and_raise(EncodingError)
-      expect(-> { described_object.send(:process!, entry) }).
+      expect { described_object.send(:process!, entry) }.
         to raise_error(EncodingError, /Error when trying to process fail\.yml/)
 
       expect(described_object).to have_received(:data_from)
     end
 
     it 're-raises errors during file opening' do
-      expect(-> { described_object.send(:open_and_process_zip, 'http://fake.url/wrong/path.zip') }).
+      expect { described_object.send(:open_and_process_zip, 'http://fake.url/wrong/path.zip') }.
         to raise_error(SocketError, /Failed to open TCP connection/)
     end
   end
@@ -35,14 +35,13 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
       expect(response['project_id']).to eq('672198945b7d72fc048021.15940510')
       expect(response['bundle_url']).to include('s3-eu-west-1.amazonaws.com')
-      expect(described_object.api_client.enable_compression).to eq(true)
     end
 
     it 're-raises errors during file download' do
       allow_project_id described_object, 'invalid'
 
       VCR.use_cassette('download_files_error') do
-        expect(-> { described_object.send :download_files }).
+        expect { described_object.send :download_files }.
           to raise_error(Lokalise::Error::BadRequest, /Invalid `project_id` parameter/)
       end
     end
@@ -57,7 +56,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         allow(fake_client).to receive(:download_files).and_raise(Lokalise::Error::TooManyRequests)
         allow(described_object).to receive(:api_client).and_return(fake_client)
 
-        expect(-> { described_object.import! }).to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 2 retries/i)
+        expect { described_object.import! }.to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 2 retries/i)
 
         expect(described_object).to have_received(:sleep).exactly(2).times
         expect(described_object).to have_received(:api_client).exactly(3).times
@@ -66,14 +65,14 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
       it 'halts when the API key is not set' do
         allow(described_object.config).to receive(:api_token).and_return(nil)
-        expect(-> { described_object.import! }).to raise_error(LokaliseManager::Error, /API token is not set/i)
+        expect { described_object.import! }.to raise_error(LokaliseManager::Error, /API token is not set/i)
         expect(described_object.config).to have_received(:api_token)
         expect(count_translations).to eq(0)
       end
 
       it 'halts when the project_id is not set' do
         allow_project_id described_object, nil do
-          expect(-> { described_object.import! }).to raise_error(LokaliseManager::Error, /ID is not set/i)
+          expect { described_object.import! }.to raise_error(LokaliseManager::Error, /ID is not set/i)
           expect(count_translations).to eq(0)
         end
       end
@@ -110,7 +109,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         result = nil
 
         VCR.use_cassette('import') do
-          expect(-> { result = described_object.import! }).to output(/complete!/).to_stdout
+          expect { result = described_object.import! }.to output(/complete!/).to_stdout
         end
 
         expect(result).to be true
@@ -125,7 +124,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         result = nil
 
         VCR.use_cassette('import') do
-          expect(-> { result = described_object.import! }).not_to output(/complete!/).to_stdout
+          expect { result = described_object.import! }.not_to output(/complete!/).to_stdout
         end
 
         expect(result).to be true
@@ -164,7 +163,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         )
 
         allow($stdin).to receive(:gets).and_return('Y')
-        expect(-> { safe_mode_obj.import! }).to output(/is not empty/).to_stdout
+        expect { safe_mode_obj.import! }.to output(/is not empty/).to_stdout
 
         expect(count_translations).to eq(5)
         expect($stdin).to have_received(:gets)
@@ -177,7 +176,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
       it 'import halts when a user chooses not to proceed' do
         allow(safe_mode_obj).to receive(:download_files).at_most(0).times
         allow($stdin).to receive(:gets).and_return('N')
-        expect(-> { safe_mode_obj.import! }).to output(/cancelled/).to_stdout
+        expect { safe_mode_obj.import! }.to output(/cancelled/).to_stdout
 
         expect(safe_mode_obj).not_to have_received(:download_files)
         expect($stdin).to have_received(:gets)
@@ -188,7 +187,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         allow(safe_mode_obj.config).to receive(:silent_mode).and_return(true)
         allow(safe_mode_obj).to receive(:download_files).at_most(0).times
         allow($stdin).to receive(:gets).and_return('N')
-        expect(-> { safe_mode_obj.import! }).not_to output(/cancelled/).to_stdout
+        expect { safe_mode_obj.import! }.not_to output(/cancelled/).to_stdout
 
         expect(safe_mode_obj).not_to have_received(:download_files)
         expect(safe_mode_obj.config).to have_received(:silent_mode)

@@ -27,7 +27,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         process = nil
 
         VCR.use_cassette('upload_files_multiple') do
-          expect(-> { process = described_object.export!.first.process }).to output(/complete!/).to_stdout
+          expect { process = described_object.export!.first.process }.to output(/complete!/).to_stdout
         end
 
         expect(process.project_id).to eq(project_id)
@@ -43,7 +43,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
         allow(described_object).to receive(:api_client).and_return(fake_client)
 
-        expect(-> { described_object.export! }).to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 1 retries/i)
+        expect { described_object.export! }.to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 1 retries/i)
 
         expect(described_object).to have_received(:sleep).exactly(6).times
         expect(described_object).to have_received(:api_client).at_least(12).times
@@ -60,7 +60,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
         allow(described_object).to receive(:api_client).and_return(fake_client)
         processes = []
-        expect(-> { processes = described_object.export! }).not_to raise_error
+        expect { processes = described_object.export! }.not_to raise_error
 
         expect(processes[0].path.to_s).to include('en_')
         expect(processes[0].success).to be false
@@ -90,7 +90,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         process = nil
 
         VCR.use_cassette('upload_files') do
-          expect(-> { process = described_object.export!.first.process }).not_to output(/complete!/).to_stdout
+          expect { process = described_object.export!.first.process }.not_to output(/complete!/).to_stdout
         end
 
         expect(process.status).to eq('queued')
@@ -126,13 +126,13 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       it 'halts when the API key is not set' do
         allow(described_object.config).to receive(:api_token).and_return(nil)
 
-        expect(-> { described_object.export! }).to raise_error(LokaliseManager::Error, /API token is not set/i)
+        expect { described_object.export! }.to raise_error(LokaliseManager::Error, /API token is not set/i)
         expect(described_object.config).to have_received(:api_token)
       end
 
       it 'halts when the project_id is not set' do
         allow_project_id described_object, nil do
-          expect(-> { described_object.export! }).to raise_error(LokaliseManager::Error, /ID is not set/i)
+          expect { described_object.export! }.to raise_error(LokaliseManager::Error, /ID is not set/i)
         end
       end
     end

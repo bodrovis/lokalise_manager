@@ -35,8 +35,8 @@ module LokaliseManager
       #
       # @return [Lokalise::Client]
       def api_client
-        client_opts = [config.api_token, {enable_compression: true}.merge(config.timeouts)]
-        client_method = config.use_oauth2_token ? :oauth_client : :client
+        client_opts = [config.api_token, config.timeouts]
+        client_method = config.use_oauth2_token ? :oauth2_client : :client
 
         @api_client = ::Lokalise.send(client_method, *client_opts)
       end
@@ -44,7 +44,7 @@ module LokaliseManager
       # Resets API client
       def reset_api_client!
         ::Lokalise.reset_client!
-        ::Lokalise.reset_oauth_client!
+        ::Lokalise.reset_oauth2_client!
         @api_client = nil
       end
 
