@@ -62,7 +62,6 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         processes = []
         expect { processes = described_object.export! }.not_to raise_error
 
-        expect(processes[0].path.to_s).to include('en_')
         expect(processes[0].success).to be false
         expect(processes[1].error.class).to eq(Lokalise::Error::TooManyRequests)
         expect(processes.count).to eq(7)
