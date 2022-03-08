@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.homepage              = 'https://github.com/bodrovis/lokalise_manager'
   spec.license               = 'MIT'
   spec.platform              = Gem::Platform::RUBY
-  spec.required_ruby_version = '>= 2.5.0'
+  spec.required_ruby_version = '>= 2.7'
 
   spec.files = Dir['README.md', 'LICENSE',
                    'CHANGELOG.md', 'lib/**/*.rb',
@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'ruby-lokalise-api', '~> 5.0'
   spec.add_dependency 'rubyzip', '~> 2.3'
+  spec.add_dependency 'zeitwerk', '~> 2.4'
 
   spec.add_development_dependency 'codecov', '~> 0.2'
   spec.add_development_dependency 'dotenv', '~> 2.5'

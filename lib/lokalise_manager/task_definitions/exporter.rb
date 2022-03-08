@@ -4,6 +4,7 @@ require 'base64'
 
 module LokaliseManager
   module TaskDefinitions
+    # Exporter class is used when you want to upload translation files from your project to Lokalise
     class Exporter < Base
       # Lokalise allows no more than 6 requests per second
       MAX_THREADS = 6
@@ -38,7 +39,9 @@ module LokaliseManager
       end
 
       def raise_on_fail(thread)
-        raise(thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}") unless thread.success
+        return if thread.success
+
+        raise(thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}")
       end
 
       # Performs the actual file uploading to Lokalise. If the API rate limit is exceeed,
@@ -59,7 +62,7 @@ module LokaliseManager
       # Gets translation files from the specified directory
       def all_files
         loc_path = config.locales_path
-        Dir["#{loc_path}/**/*"].map do |f|
+        Dir["#{loc_path}/**/*"].filter_map do |f|
           full_path = Pathname.new f
 
           next unless file_matches_criteria? full_path
@@ -67,7 +70,7 @@ module LokaliseManager
           relative_path = full_path.relative_path_from Pathname.new(loc_path)
 
           [full_path, relative_path]
-        end.compact
+        end
       end
 
       # Generates export options

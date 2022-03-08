@@ -81,10 +81,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
     context 'when directory is empty' do
       before do
         mkdir_locales
-        rm_translation_files
       end
 
-      after :all do
+      after do
         rm_translation_files
       end
 
@@ -141,16 +140,13 @@ describe LokaliseManager::TaskDefinitions::Importer do
                             import_safe_mode: true
       end
 
-      before :all do
-        mkdir_locales
-      end
-
       before do
+        mkdir_locales
         rm_translation_files
         add_translation_files!
       end
 
-      after :all do
+      after do
         rm_translation_files
       end
 
@@ -183,7 +179,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         expect(count_translations).to eq(1)
       end
 
-      it 'import halts when a user chooses not to proceed and debug info is not printed out when silent_mode is enabled' do
+      it 'import halts when a user chooses to halt and debug info is not printed out when silent_mode is enabled' do
         allow(safe_mode_obj.config).to receive(:silent_mode).and_return(true)
         allow(safe_mode_obj).to receive(:download_files).at_most(0).times
         allow($stdin).to receive(:gets).and_return('N')

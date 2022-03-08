@@ -4,7 +4,9 @@ require 'fileutils'
 
 module FileManager
   def mkdir_locales
-    FileUtils.mkdir_p(LokaliseManager::GlobalConfig.locales_path) unless File.directory?(LokaliseManager::GlobalConfig.locales_path)
+    return if File.directory?(LokaliseManager::GlobalConfig.locales_path)
+
+    FileUtils.mkdir_p(LokaliseManager::GlobalConfig.locales_path)
   end
 
   def rm_translation_files

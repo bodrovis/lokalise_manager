@@ -1,16 +1,21 @@
 # frozen_string_literal: true
 
+require 'zeitwerk'
 require 'yaml'
 
-require 'lokalise_manager/utils/hash_utils'
+loader = Zeitwerk::Loader.for_gem
+loader.setup
 
-require 'lokalise_manager/version'
-require 'lokalise_manager/error'
-require 'lokalise_manager/global_config'
-require 'lokalise_manager/task_definitions/base'
-require 'lokalise_manager/task_definitions/importer'
-require 'lokalise_manager/task_definitions/exporter'
-
+# LokaliseManager main module that exposes helper methods:
+#
+#   importer = LokaliseManager.importer api_token: '1234abc', project_id: '123.abc'
+#   exporter = LokaliseManager.exporter api_token: '1234abc', project_id: '123.abc'
+#
+# Use the instantiated objects to import or export your translation files:
+#
+#   importer.import!
+#   exporter.export!
+#
 module LokaliseManager
   class << self
     # Initializes a new importer client which is used to download

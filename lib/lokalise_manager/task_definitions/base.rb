@@ -5,6 +5,7 @@ require 'pathname'
 
 module LokaliseManager
   module TaskDefinitions
+    # Base class for LokaliseManager task definitions that includes common methods and logic
     class Base
       using LokaliseManager::Utils::HashUtils
 

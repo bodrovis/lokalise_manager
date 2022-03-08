@@ -14,114 +14,81 @@ describe LokaliseManager::TaskDefinitions::Exporter do
   end
 
   context 'with many translation files' do
-    before :all do
-      add_translation_files! with_ru: true, additional: 5
-    end
-
-    after :all do
-      rm_translation_files
-    end
-
     describe '.export!' do
-      it 'sends a proper API request and handles rate limiting' do
-        process = nil
-
-        VCR.use_cassette('upload_files_multiple') do
-          expect { process = described_object.export!.first.process }.to output(/complete!/).to_stdout
+      context 'with no errors' do
+        before do
+          add_translation_files! with_ru: true, additional: 5
         end
 
-        expect(process.project_id).to eq(project_id)
-        expect(process.status).to eq('queued')
+        after do
+          rm_translation_files
+        end
+
+        it 'sends a proper API request and handles rate limiting' do
+          process = nil
+
+          VCR.use_cassette('upload_files_multiple') do
+            expect { process = described_object.export!.first.process }.to output(/complete!/).to_stdout
+          end
+
+          expect(process.project_id).to eq(project_id)
+          expect(process.status).to eq('queued')
+        end
+
+        it 'handles too many requests but does not re-raise anything when raise_on_export_fail is false' do
+          allow(described_object.config).to receive(:max_retries_export).and_return(1)
+          allow(described_object.config).to receive(:raise_on_export_fail).and_return(false)
+          allow(described_object).to receive(:sleep).and_return(0)
+
+          fake_client = instance_double('Lokalise::Client')
+          allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
+          allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
+          allow(described_object).to receive(:api_client).and_return(fake_client)
+          processes = []
+          expect { processes = described_object.export! }.not_to raise_error
+
+          expect(processes[0].success).to be false
+          expect(processes[1].error.class).to eq(Lokalise::Error::TooManyRequests)
+          expect(processes.count).to eq(7)
+
+          expect(described_object).to have_received(:sleep).exactly(7).times
+          expect(described_object).to have_received(:api_client).at_least(14).times
+          expect(fake_client).to have_received(:upload_file).exactly(14).times
+        end
       end
 
-      it 'handles too many requests' do
-        allow(described_object.config).to receive(:max_retries_export).and_return(1)
-        allow(described_object).to receive(:sleep).and_return(0)
+      context 'with errors' do
+        before do
+          add_translation_files! with_ru: true
+        end
 
-        fake_client = instance_double('Lokalise::Client')
-        allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
-        allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
-        allow(described_object).to receive(:api_client).and_return(fake_client)
+        after do
+          rm_translation_files
+        end
 
-        expect { described_object.export! }.to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 1 retries/i)
+        it 'handles too many requests' do
+          allow(described_object.config).to receive(:max_retries_export).and_return(1)
+          allow(described_object).to receive(:sleep).and_return(0)
 
-        expect(described_object).to have_received(:sleep).exactly(6).times
-        expect(described_object).to have_received(:api_client).at_least(12).times
-        expect(fake_client).to have_received(:upload_file).exactly(12).times
-      end
+          fake_client = instance_double('Lokalise::Client')
+          allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
+          allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
+          allow(described_object).to receive(:api_client).and_return(fake_client)
 
-      it 'handles too many requests but does not re-raise anything when raise_on_export_fail is false' do
-        allow(described_object.config).to receive(:max_retries_export).and_return(1)
-        allow(described_object.config).to receive(:raise_on_export_fail).and_return(false)
-        allow(described_object).to receive(:sleep).and_return(0)
+          expect do
+            described_object.export!
+          end.to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 1 retries/i)
 
-        fake_client = instance_double('Lokalise::Client')
-        allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
-        allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
-        allow(described_object).to receive(:api_client).and_return(fake_client)
-        processes = []
-        expect { processes = described_object.export! }.not_to raise_error
-
-        expect(processes[0].success).to be false
-        expect(processes[1].error.class).to eq(Lokalise::Error::TooManyRequests)
-        expect(processes.count).to eq(7)
-
-        expect(described_object).to have_received(:sleep).exactly(7).times
-        expect(described_object).to have_received(:api_client).at_least(14).times
-        expect(fake_client).to have_received(:upload_file).exactly(14).times
+          expect(described_object).to have_received(:sleep).exactly(2).times
+          expect(described_object).to have_received(:api_client).at_least(4).times
+          expect(fake_client).to have_received(:upload_file).exactly(4).times
+        end
       end
     end
   end
 
   context 'with one translation file' do
-    before :all do
-      add_translation_files!
-    end
-
-    after :all do
-      rm_translation_files
-    end
-
-    describe '.export!' do
-      it 'sends a proper API request but does not output anything when silent_mode is enabled' do
-        allow(described_object.config).to receive(:silent_mode).and_return(true)
-
-        process = nil
-
-        VCR.use_cassette('upload_files') do
-          expect { process = described_object.export!.first.process }.not_to output(/complete!/).to_stdout
-        end
-
-        expect(process.status).to eq('queued')
-        expect(described_object.config).to have_received(:silent_mode).at_most(1).times
-      end
-
-      it 'sends a proper API request' do
-        process = VCR.use_cassette('upload_files') do
-          described_object.export!
-        end.first.process
-
-        expect(process.project_id).to eq(project_id)
-        expect(process.status).to eq('queued')
-      end
-
-      it 'sends a proper API request when a different branch is provided' do
-        allow(described_object.config).to receive(:branch).and_return('develop')
-
-        process_data = VCR.use_cassette('upload_files_branch') do
-          described_object.export!
-        end.first
-
-        expect(described_object.config).to have_received(:branch).at_most(2).times
-        expect(process_data.success).to be true
-        expect(process_data.path.to_s).to include('en.yml')
-
-        process = process_data.process
-        expect(process).to be_an_instance_of(Lokalise::Resources::QueuedProcess)
-        expect(process.project_id).to eq(project_id)
-        expect(process.status).to eq('queued')
-      end
-
+    context 'without files' do
       it 'halts when the API key is not set' do
         allow(described_object.config).to receive(:api_token).and_return(nil)
 
@@ -136,7 +103,66 @@ describe LokaliseManager::TaskDefinitions::Exporter do
       end
     end
 
+    context 'with files' do
+      before do
+        add_translation_files!
+      end
+
+      after do
+        rm_translation_files
+      end
+
+      describe '.export!' do
+        it 'sends a proper API request but does not output anything when silent_mode is enabled' do
+          allow(described_object.config).to receive(:silent_mode).and_return(true)
+
+          process = nil
+
+          VCR.use_cassette('upload_files') do
+            expect { process = described_object.export!.first.process }.not_to output(/complete!/).to_stdout
+          end
+
+          expect(process.status).to eq('queued')
+          expect(described_object.config).to have_received(:silent_mode).at_most(1).times
+        end
+
+        it 'sends a proper API request' do
+          process = VCR.use_cassette('upload_files') do
+            described_object.export!
+          end.first.process
+
+          expect(process.project_id).to eq(project_id)
+          expect(process.status).to eq('queued')
+        end
+
+        it 'sends a proper API request when a different branch is provided' do
+          allow(described_object.config).to receive(:branch).and_return('develop')
+
+          process_data = VCR.use_cassette('upload_files_branch') do
+            described_object.export!
+          end.first
+
+          expect(described_object.config).to have_received(:branch).at_most(2).times
+          expect(process_data.success).to be true
+          expect(process_data.path.to_s).to include('en.yml')
+
+          process = process_data.process
+          expect(process).to be_an_instance_of(Lokalise::Resources::QueuedProcess)
+          expect(process.project_id).to eq(project_id)
+          expect(process.status).to eq('queued')
+        end
+      end
+    end
+
     describe '#all_files' do
+      before do
+        add_translation_files!
+      end
+
+      after do
+        rm_translation_files
+      end
+
       it 'yield proper arguments' do
         expect(described_object.send(:all_files).flatten).to include(
           Pathname.new(path),
@@ -146,6 +172,14 @@ describe LokaliseManager::TaskDefinitions::Exporter do
     end
 
     describe '.opts' do
+      before do
+        add_translation_files!
+      end
+
+      after do
+        rm_translation_files
+      end
+
       let(:base64content) { Base64.strict_encode64(File.read(path).strip) }
 
       it 'generates proper options' do
@@ -178,11 +212,11 @@ describe LokaliseManager::TaskDefinitions::Exporter do
     let(:filename_ru) { 'ru.yml' }
     let(:path_ru) { "#{Dir.getwd}/locales/#{filename_ru}" }
 
-    before :all do
+    before do
       add_translation_files! with_ru: true
     end
 
-    after :all do
+    after do
       rm_translation_files
     end
 

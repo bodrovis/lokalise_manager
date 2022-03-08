@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module LokaliseManager
+  # Global configuration options available for LokaliseManager
   class GlobalConfig
     class << self
       attr_accessor :api_token, :project_id

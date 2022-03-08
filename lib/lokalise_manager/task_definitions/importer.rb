@@ -6,6 +6,7 @@ require 'fileutils'
 
 module LokaliseManager
   module TaskDefinitions
+    # Importer class is used when you want to download translation files from Lokalise into your project
     class Importer < Base
       # Performs translation files import from Lokalise
       #

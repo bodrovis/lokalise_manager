@@ -63,14 +63,18 @@ describe LokaliseManager::TaskDefinitions::Base do
     it 'raises an error when the API key is not set' do
       allow(LokaliseManager::GlobalConfig).to receive(:api_token).and_return(nil)
 
-      expect { described_object.send(:check_options_errors!) }.to raise_error(LokaliseManager::Error, /API token is not set/i)
+      expect do
+        described_object.send(:check_options_errors!)
+      end.to raise_error(LokaliseManager::Error, /API token is not set/i)
 
       expect(LokaliseManager::GlobalConfig).to have_received(:api_token)
     end
 
     it 'returns an error when the project_id is not set' do
       allow_project_id described_object, nil do
-        expect { described_object.send(:check_options_errors!) }.to raise_error(LokaliseManager::Error, /ID is not set/i)
+        expect do
+          described_object.send(:check_options_errors!)
+        end.to raise_error(LokaliseManager::Error, /ID is not set/i)
       end
     end
   end

@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0 (unreleased)
+
+* Use ruby-lokalise-api v6
+* Use Zeitwerk loader
+* Prettify and update source code
+
 ## 2.2.0 (23-Feb-22)
 
 * Use ruby-lokalise-api v5
