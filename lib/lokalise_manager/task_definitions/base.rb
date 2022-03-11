@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'ruby-lokalise-api'
+require 'ruby_lokalise_api'
 require 'pathname'
 
 module LokaliseManager
@@ -34,18 +34,18 @@ module LokaliseManager
 
       # Creates a Lokalise API client
       #
-      # @return [Lokalise::Client]
+      # @return [RubyLokaliseApi::Client]
       def api_client
         client_opts = [config.api_token, config.timeouts]
         client_method = config.use_oauth2_token ? :oauth2_client : :client
 
-        @api_client = ::Lokalise.send(client_method, *client_opts)
+        @api_client = ::RubyLokaliseApi.send(client_method, *client_opts)
       end
 
       # Resets API client
       def reset_api_client!
-        ::Lokalise.reset_client!
-        ::Lokalise.reset_oauth2_client!
+        ::RubyLokaliseApi.reset_client!
+        ::RubyLokaliseApi.reset_oauth2_client!
         @api_client = nil
       end
 
@@ -95,7 +95,7 @@ module LokaliseManager
         retries = 0
         begin
           yield
-        rescue Lokalise::Error::TooManyRequests => e
+        rescue RubyLokaliseApi::Error::TooManyRequests => e
           raise(e.class, "Gave up after #{retries} retries") if retries >= max_retries
 
           sleep 2**retries

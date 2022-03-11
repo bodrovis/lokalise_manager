@@ -42,7 +42,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
       VCR.use_cassette('download_files_error') do
         expect { described_object.send :download_files }.
-          to raise_error(Lokalise::Error::BadRequest, /Invalid `project_id` parameter/)
+          to raise_error(RubyLokaliseApi::Error::BadRequest, /Invalid `project_id` parameter/)
       end
     end
   end
@@ -52,11 +52,11 @@ describe LokaliseManager::TaskDefinitions::Importer do
       it 'handles too many requests' do
         allow(described_object).to receive(:sleep).and_return(0)
 
-        fake_client = instance_double('Lokalise::Client')
-        allow(fake_client).to receive(:download_files).and_raise(Lokalise::Error::TooManyRequests)
+        fake_client = instance_double('RubyLokaliseApi::Client')
+        allow(fake_client).to receive(:download_files).and_raise(RubyLokaliseApi::Error::TooManyRequests)
         allow(described_object).to receive(:api_client).and_return(fake_client)
 
-        expect { described_object.import! }.to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 2 retries/i)
+        expect { described_object.import! }.to raise_error(RubyLokaliseApi::Error::TooManyRequests, /Gave up after 2 retries/i)
 
         expect(described_object).to have_received(:sleep).exactly(2).times
         expect(described_object).to have_received(:api_client).exactly(3).times

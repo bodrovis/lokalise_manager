@@ -1,8 +1,9 @@
 # Changelog
 
-## 3.0.0 (unreleased)
+## 3.0.0 (11-Mar-22)
 
-* Use ruby-lokalise-api v6
+* **Breaking change**: Require Ruby 2.7 or above
+* **Breaking change (potentially)**: Use ruby-lokalise-api v6. In general, this transition should not affect you if you employ `export!` and `import!` methods only. However, please be aware that ruby-lokalise-api has a few breaking changes [listed in its own changelog](https://lokalise.github.io/ruby-lokalise-api/additional_info/changelog)
 * Use Zeitwerk loader
 * Prettify and update source code
 

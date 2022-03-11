@@ -40,15 +40,15 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           allow(described_object.config).to receive(:raise_on_export_fail).and_return(false)
           allow(described_object).to receive(:sleep).and_return(0)
 
-          fake_client = instance_double('Lokalise::Client')
+          fake_client = instance_double('RubyLokaliseApi::Client')
           allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
-          allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
+          allow(fake_client).to receive(:upload_file).with(any_args).and_raise(RubyLokaliseApi::Error::TooManyRequests)
           allow(described_object).to receive(:api_client).and_return(fake_client)
           processes = []
           expect { processes = described_object.export! }.not_to raise_error
 
           expect(processes[0].success).to be false
-          expect(processes[1].error.class).to eq(Lokalise::Error::TooManyRequests)
+          expect(processes[1].error.class).to eq(RubyLokaliseApi::Error::TooManyRequests)
           expect(processes.count).to eq(7)
 
           expect(described_object).to have_received(:sleep).exactly(7).times
@@ -70,14 +70,14 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           allow(described_object.config).to receive(:max_retries_export).and_return(1)
           allow(described_object).to receive(:sleep).and_return(0)
 
-          fake_client = instance_double('Lokalise::Client')
+          fake_client = instance_double('RubyLokaliseApi::Client')
           allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
-          allow(fake_client).to receive(:upload_file).with(any_args).and_raise(Lokalise::Error::TooManyRequests)
+          allow(fake_client).to receive(:upload_file).with(any_args).and_raise(RubyLokaliseApi::Error::TooManyRequests)
           allow(described_object).to receive(:api_client).and_return(fake_client)
 
           expect do
             described_object.export!
-          end.to raise_error(Lokalise::Error::TooManyRequests, /Gave up after 1 retries/i)
+          end.to raise_error(RubyLokaliseApi::Error::TooManyRequests, /Gave up after 1 retries/i)
 
           expect(described_object).to have_received(:sleep).exactly(2).times
           expect(described_object).to have_received(:api_client).at_least(4).times
@@ -147,7 +147,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           expect(process_data.path.to_s).to include('en.yml')
 
           process = process_data.process
-          expect(process).to be_an_instance_of(Lokalise::Resources::QueuedProcess)
+          expect(process).to be_an_instance_of(RubyLokaliseApi::Resources::QueuedProcess)
           expect(process.project_id).to eq(project_id)
           expect(process.status).to eq('queued')
         end
@@ -225,7 +225,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         allow_project_id described_object, '542886116159f798720dc4.94769464'
 
         VCR.use_cassette('upload_files_error') do
-          expect { described_object.export! }.to raise_error(Lokalise::Error::BadRequest, /Unknown `lang_iso`/)
+          expect { described_object.export! }.to raise_error(RubyLokaliseApi::Error::BadRequest, /Unknown `lang_iso`/)
         end
       end
     end

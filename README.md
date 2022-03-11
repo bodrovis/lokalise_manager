@@ -70,7 +70,7 @@ The uploading process is multi-threaded.
 `processes` will contain an array of objects responding to the following methods:
 
 * `#success` — usually returns `true` (to learn more, check documentation for the `:raise_on_export_fail` option below)
-* `#process` — returns an object (an instance of the `Lokalise::Resources::QueuedProcess`) representing a [queued background process](https://lokalise.github.io/ruby-lokalise-api/api/queued-processes) as uploading is done in the background on Lokalise.
+* `#process` — returns an object (an instance of the `RubyLokaliseApi::Resources::QueuedProcess`) representing a [queued background process](https://lokalise.github.io/ruby-lokalise-api/api/queued-processes) as uploading is done in the background on Lokalise.
 * `#path` — returns an instance of the `Pathname` class which represent the file being uploaded.
 
 You can perform periodic checks to read the status of the process. Here's a very simple example:
@@ -139,7 +139,7 @@ importer = LokaliseManager.importer api_token: '1234abc',
 ```
 
 * `import_safe_mode` (`boolean`) — default to `false`. When this option is enabled, the import task will check whether the directory set with `locales_path` is empty or not. If it is not empty, you will be prompted to continue.
-* `max_retries_import` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, this gem will apply an exponential backoff mechanism with a very simple formula: `2 ** retries`. If the maximum number of retries has been reached, a `Lokalise::Error::TooManyRequests` exception will be raised and the operation will be halted.
+* `max_retries_import` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, this gem will apply an exponential backoff mechanism with a very simple formula: `2 ** retries`. If the maximum number of retries has been reached, a `RubyLokaliseApi::Error::TooManyRequests` exception will be raised and the operation will be halted.
 
 ### Export config
 
@@ -171,7 +171,7 @@ In this case the `export_opts` will have `detect_icu_plurals` set to `true` and 
 c.skip_file_export = ->(file) { f.split[1].to_s.include?('fr') }
 ```
 
-* `max_retries_export` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, LokaliseManager will apply an exponential backoff mechanism with a very simple formula: `2 ** retries` (initially `retries` is `0`). If the maximum number of retries has been reached, a `Lokalise::Error::TooManyRequests` exception will be raised and the export operation will be halted. By default, LokaliseManager will make up to `5` retries which potentially means `1 + 2 + 4 + 8 + 16 + 32 = 63` seconds of waiting time. If the `max_retries_export` is less than `1`, LokaliseManager will not perform any retries and give up immediately after receiving error 429.
+* `max_retries_export` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, LokaliseManager will apply an exponential backoff mechanism with a very simple formula: `2 ** retries` (initially `retries` is `0`). If the maximum number of retries has been reached, a `RubyLokaliseApi::Error::TooManyRequests` exception will be raised and the export operation will be halted. By default, LokaliseManager will make up to `5` retries which potentially means `1 + 2 + 4 + 8 + 16 + 32 = 63` seconds of waiting time. If the `max_retries_export` is less than `1`, LokaliseManager will not perform any retries and give up immediately after receiving error 429.
 * `raise_on_export_fail` (`boolean`) — default is `true`. When this option is enabled, LokaliseManager will re-raise any exceptions that happened during the file uploading. In other words, if any uploading thread raised an exception, your exporting process will exit with an exception. Suppose, you are uploading 12 translation files; these files will be split in 2 groups with 6 files each, and each group will be uploaded in parallel (using threads). However, suppose some exception happens when uploading the first group. By default this exception will be re-raised for the whole process and the script will never try to upload the second group. If you would like to continue uploading even if an exception happened, set the `raise_on_export_fail` to `false`. In this case the `export!` method will return an array with scheduled processes and with information about processes that were not successfully scheduled. This information is represented as an object with three methods: `path` (contains an instance of the `Pathname` class which says which file could not be uploaded), `error` (the actual exception), and `success` (returns `false`). So, you can use the following snippet to check your processes:
 
 ```ruby

@@ -22,7 +22,7 @@ describe LokaliseManager::TaskDefinitions::Base do
   end
 
   specify '.reset_client!' do
-    expect(described_object.api_client).to be_an_instance_of(Lokalise::Client)
+    expect(described_object.api_client).to be_an_instance_of(RubyLokaliseApi::Client)
     described_object.reset_api_client!
     current_client = described_object.instance_variable_get :@api_client
     expect(current_client).to be_nil
@@ -99,8 +99,8 @@ describe LokaliseManager::TaskDefinitions::Base do
                                                                       })
 
       client = described_object.api_client
-      expect(client).to be_an_instance_of(Lokalise::Client)
-      expect(client).not_to be_an_instance_of(Lokalise::OAuth2Client)
+      expect(client).to be_an_instance_of(RubyLokaliseApi::Client)
+      expect(client).not_to be_an_instance_of(RubyLokaliseApi::OAuth2Client)
       expect(client.open_timeout).to eq(100)
       expect(client.timeout).to eq(500)
     end
@@ -110,8 +110,8 @@ describe LokaliseManager::TaskDefinitions::Base do
 
       client = described_object.api_client
 
-      expect(client).to be_an_instance_of(Lokalise::OAuth2Client)
-      expect(client).not_to be_an_instance_of(Lokalise::Client)
+      expect(client).to be_an_instance_of(RubyLokaliseApi::OAuth2Client)
+      expect(client).not_to be_an_instance_of(RubyLokaliseApi::Client)
     end
   end
 end
