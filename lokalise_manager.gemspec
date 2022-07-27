@@ -19,7 +19,6 @@ Gem::Specification.new do |spec|
                    'lib/**/*.rake',
                    'lokalise_manager.gemspec', '.github/*.md',
                    'Gemfile', 'Rakefile']
-  spec.test_files       = Dir['spec/**/*.rb']
   spec.extra_rdoc_files = ['README.md']
   spec.require_paths    = ['lib']
 

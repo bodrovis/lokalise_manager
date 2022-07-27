@@ -6,10 +6,10 @@ describe LokaliseManager::TaskDefinitions::Exporter do
   let(:filename) { 'en.yml' }
   let(:path) { "#{Dir.getwd}/locales/nested/#{filename}" }
   let(:relative_name) { "nested/#{filename}" }
-  let(:project_id) { ENV['LOKALISE_PROJECT_ID'] }
+  let(:project_id) { ENV.fetch('LOKALISE_PROJECT_ID', nil) }
   let(:described_object) do
     described_class.new project_id: project_id,
-                        api_token: ENV['LOKALISE_API_TOKEN'],
+                        api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
                         max_retries_export: 2
   end
 
@@ -40,7 +40,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           allow(described_object.config).to receive(:raise_on_export_fail).and_return(false)
           allow(described_object).to receive(:sleep).and_return(0)
 
-          fake_client = instance_double('RubyLokaliseApi::Client')
+          fake_client = instance_double(RubyLokaliseApi::Client)
           allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
           allow(fake_client).to receive(:upload_file).with(any_args).and_raise(RubyLokaliseApi::Error::TooManyRequests)
           allow(described_object).to receive(:api_client).and_return(fake_client)
@@ -70,7 +70,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           allow(described_object.config).to receive(:max_retries_export).and_return(1)
           allow(described_object).to receive(:sleep).and_return(0)
 
-          fake_client = instance_double('RubyLokaliseApi::Client')
+          fake_client = instance_double(RubyLokaliseApi::Client)
           allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
           allow(fake_client).to receive(:upload_file).with(any_args).and_raise(RubyLokaliseApi::Error::TooManyRequests)
           allow(described_object).to receive(:api_client).and_return(fake_client)

@@ -120,7 +120,7 @@ Please don't forget that Lokalise API has rate limiting and you cannot send more
 }
 ```
 
-Full list of available import options [can be found in the official API documentation](https://app.lokalise.com/api2docs/curl/#transition-download-files-post).
+Full list of available import options [can be found in the official API documentation](https://developers.lokalise.com/reference/download-files).
 
 You can provide additional options, and they will be merged with the default ones. For example:
 
@@ -143,7 +143,7 @@ importer = LokaliseManager.importer api_token: '1234abc',
 
 ### Export config
 
-* `export_opts` (`hash`) — options that will be passed to Lokalise API when uploading translations. Full list of available export options [can be found in the official documentation](https://app.lokalise.com/api2docs/curl/#transition-upload-a-file-post). By default, the following options are provided:
+* `export_opts` (`hash`) — options that will be passed to Lokalise API when uploading translations. Full list of available export options [can be found in the official documentation](https://developers.lokalise.com/reference/upload-a-file). By default, the following options are provided:
   + `data` (`string`, required) — base64-encoded contents of the translation file.
   + `filename` (`string`, required) — translation file name. If the file is stored under a subdirectory (for example, `nested/en.yml` inside the `locales/` directory), the whole path acts as a name. Later when importing files with such names, they will be placed into the proper subdirectories.
   + `lang_iso` (`string`, required) — language ISO code which is determined using the root key inside your YAML file. For example, in this case the `lang_iso` is `en_US`:
