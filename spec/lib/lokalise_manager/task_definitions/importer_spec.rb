@@ -115,9 +115,14 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
         expect(result).to be true
 
-        expect(count_translations).to eq(24)
-        expect_file_exist loc_path, 'en_1.yml'
-        expect_file_exist loc_path, 'ru_2.yml'
+        expect(count_translations).to eq(5)
+        expect_file_exist loc_path, 'en.yaml'
+        expect_file_exist loc_path, 'fr.yaml'
+
+        trans_data = YAML.load_file(File.join(loc_path, 'en.yaml'))
+        # rubocop:disable Style/FormatStringToken
+        expect(trans_data['en']['welcome']).to eq('Welcome to the app, %{username}')
+        # rubocop:enable Style/FormatStringToken
       end
 
       it 'runs import successfully but does not provide any output when silent_mode is enabled' do
@@ -129,8 +134,8 @@ describe LokaliseManager::TaskDefinitions::Importer do
         end
 
         expect(result).to be true
-        expect_file_exist loc_path, 'en_1.yml'
-        expect_file_exist loc_path, 'ru_2.yml'
+        expect_file_exist loc_path, 'en.yaml'
+        expect_file_exist loc_path, 'fr.yaml'
         expect(described_object.config).to have_received(:silent_mode).at_most(1).times
       end
     end
