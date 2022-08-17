@@ -5,7 +5,7 @@ require File.expand_path('lib/lokalise_manager/version', __dir__)
 Gem::Specification.new do |spec|
   spec.name                  = 'lokalise_manager'
   spec.version               = LokaliseManager::VERSION
-  spec.authors               = ['Ilya Bodrov']
+  spec.authors               = ['Ilya Krukowski']
   spec.email                 = ['golosizpru@gmail.com']
   spec.summary               = 'Lokalise integration for Ruby'
   spec.description           = 'This gem contains a collection of some common tasks for Lokalise. Specifically, it allows to import/export translation files from/to Lokalise TMS.'
