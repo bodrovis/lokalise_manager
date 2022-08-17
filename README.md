@@ -111,7 +111,7 @@ Please don't forget that Lokalise API has rate limiting and you cannot send more
 
 ```ruby
 {
-  format: 'yaml',
+  format: 'ruby_yaml',
   placeholder_format: :icu,
   yaml_include_root: true,
   original_filenames: true,

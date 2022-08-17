@@ -65,7 +65,7 @@ module LokaliseManager
       # Options for import rake task
       def import_opts
         @import_opts || {
-          format: 'yaml',
+          format: 'ruby_yaml',
           placeholder_format: :icu,
           yaml_include_root: true,
           original_filenames: true,

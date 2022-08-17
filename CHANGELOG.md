@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0 (17-Aug-22)
+
+* The default format is now `ruby_yaml` (it used to be `yaml`)
+
 ## 3.0.0 (11-Mar-22)
 
 * **Breaking change**: Require Ruby 2.7 or above
