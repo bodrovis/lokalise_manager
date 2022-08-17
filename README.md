@@ -135,7 +135,7 @@ In this case the `import_opts` will have `original_filenames` set to `true` and 
 ```ruby
 importer = LokaliseManager.importer api_token: '1234abc',
                                     project_id: '123.abc',
-                                    import_opts: {indentation: '4sp}
+                                    import_opts: {indentation: '4sp'}
 ```
 
 * `import_safe_mode` (`boolean`) — default to `false`. When this option is enabled, the import task will check whether the directory set with `locales_path` is empty or not. If it is not empty, you will be prompted to continue.
