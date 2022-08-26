@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.0 (26-Aug-22)
+
+* Fixed an issue when `\n` inside translations was imported as `\\n`. The default value for the `translations_converter` is now `->(raw_data) { YAML.safe_dump(raw_data).gsub(/\\\\n/, '\n') }`.
+
 ## 3.1.0 (17-Aug-22)
 
 * The default format is now `ruby_yaml` (it used to be `yaml`)

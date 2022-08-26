@@ -125,6 +125,32 @@ describe LokaliseManager::TaskDefinitions::Importer do
         # rubocop:enable Style/FormatStringToken
       end
 
+      it 'handles newlines properly', slow: true do
+        importer = described_class.new project_id: '913601666308c64dc13bb9.52811572',
+                                       api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
+                                       import_opts: {replace_breaks: false}
+
+        VCR.use_cassette('import_breaks') do
+          expect { importer.import! }.to output(/complete!/).to_stdout
+        end
+
+        trans_data = YAML.load_file(File.join(loc_path, 'en.yml'))
+        expect(trans_data['en']['hello_html']).to eq("<h1>\nhello world\n</h1>\n")
+      end
+
+      it 'handles backslashes properly' do
+        importer = described_class.new project_id: '913601666308c64dc13bb9.52811572',
+                                       api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
+                                       max_retries_import: 2
+
+        VCR.use_cassette('import_backslashes') do
+          expect { importer.import! }.to output(/complete!/).to_stdout
+        end
+
+        trans_data = YAML.load_file(File.join(loc_path, 'en.yml'))
+        expect(trans_data['en']['hello_html']).to eq("<h1>\nhello\nworld\n</h1>\n")
+      end
+
       it 'runs import successfully but does not provide any output when silent_mode is enabled' do
         allow(described_object.config).to receive(:silent_mode).and_return(true)
         result = nil

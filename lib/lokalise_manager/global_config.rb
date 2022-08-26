@@ -95,7 +95,7 @@ module LokaliseManager
 
       # Converts translations data to the proper format
       def translations_converter
-        @translations_converter || ->(raw_data) { raw_data.to_yaml }
+        @translations_converter || ->(raw_data) { YAML.safe_dump(raw_data).gsub(/\\\\n/, '\n') }
       end
 
       # Infers lang ISO for the given translation file
