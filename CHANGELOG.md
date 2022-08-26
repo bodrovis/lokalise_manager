@@ -2,7 +2,7 @@
 
 ## 3.2.0 (26-Aug-22)
 
-* Fixed an issue when `\n` inside translations was imported as `\\n`. The default value for the `translations_converter` is now `->(raw_data) { YAML.safe_dump(raw_data).gsub(/\\\\n/, '\n') }`.
+* Fixed an issue when `\n` inside translations was imported as `\\n`. The default value for the `translations_converter` is now `->(raw_data) { YAML.dump(raw_data).gsub(/\\\\n/, '\n') }`.
 
 ## 3.1.0 (17-Aug-22)
 

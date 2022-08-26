@@ -3,8 +3,6 @@
 module LokaliseManager
   # Global configuration options available for LokaliseManager
   class GlobalConfig
-    using LokaliseManager::Utils::PsychUtils
-
     class << self
       attr_accessor :api_token, :project_id
       attr_writer :import_opts, :import_safe_mode, :export_opts, :locales_path,
@@ -97,7 +95,7 @@ module LokaliseManager
 
       # Converts translations data to the proper format
       def translations_converter
-        @translations_converter || ->(raw_data) { YAML.safe_dump(raw_data).gsub(/\\\\n/, '\n') }
+        @translations_converter || ->(raw_data) { YAML.dump(raw_data).gsub(/\\\\n/, '\n') }
       end
 
       # Infers lang ISO for the given translation file
