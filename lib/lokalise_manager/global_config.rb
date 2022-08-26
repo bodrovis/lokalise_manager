@@ -3,6 +3,8 @@
 module LokaliseManager
   # Global configuration options available for LokaliseManager
   class GlobalConfig
+    using LokaliseManager::Utils::PsychUtils
+
     class << self
       attr_accessor :api_token, :project_id
       attr_writer :import_opts, :import_safe_mode, :export_opts, :locales_path,
