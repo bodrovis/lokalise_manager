@@ -15,6 +15,10 @@
 * Use Zeitwerk loader
 * Prettify and update source code
 
+## 2.2.1 (19-Oct-22)
+
+* Replaced `filter` with `select` as it does not work with Ruby 2.5
+
 ## 2.2.0 (23-Feb-22)
 
 * Use ruby-lokalise-api v5
