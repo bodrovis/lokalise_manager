@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.3.0 (18-Nov-22)
+
+* Use newer ruby-lokalise-api
+* Minor updates
+
 ## 3.2.0 (26-Aug-22)
 
 * Fixed an issue when `\n` inside translations was imported as `\\n`. The default value for the `translations_converter` is now `->(raw_data) { YAML.dump(raw_data).gsub(/\\\\n/, '\n') }`.

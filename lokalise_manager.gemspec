@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.extra_rdoc_files = ['README.md']
   spec.require_paths    = ['lib']
 
-  spec.add_dependency 'ruby-lokalise-api', '~> 6.0'
+  spec.add_dependency 'ruby-lokalise-api', '~> 7'
   spec.add_dependency 'rubyzip', '~> 2.3'
   spec.add_dependency 'zeitwerk', '~> 2.4'
 
@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.6'
   spec.add_development_dependency 'rubocop', '~> 1.0'
   spec.add_development_dependency 'rubocop-performance', '~> 1.5'
+  spec.add_development_dependency 'rubocop-rake', '~> 0.6'
   spec.add_development_dependency 'rubocop-rspec', '~> 2.6'
   spec.add_development_dependency 'simplecov', '~> 0.16'
   spec.add_development_dependency 'vcr', '~> 6.0'

@@ -9,6 +9,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
   let(:loc_path) { described_object.config.locales_path }
   let(:project_id) { ENV.fetch('LOKALISE_PROJECT_ID', nil) }
   let(:local_trans) { "#{Dir.getwd}/spec/fixtures/trans.zip" }
+  let(:local_trans_slashes) { "#{Dir.getwd}/spec/fixtures/trans_slashes.zip" }
 
   describe '#open_and_process_zip' do
     it 're-raises errors during file processing' do
@@ -107,6 +108,13 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'runs import successfully' do
+        allow(described_object).to receive(:download_files).and_return(
+          {
+            'project_id' => '123.abc',
+            'bundle_url' => local_trans
+          }
+        )
+
         result = nil
 
         VCR.use_cassette('import') do
@@ -115,14 +123,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
         expect(result).to be true
 
-        expect(count_translations).to eq(5)
-        expect_file_exist loc_path, 'en.yaml'
-        expect_file_exist loc_path, 'fr.yaml'
-
-        trans_data = YAML.load_file(File.join(loc_path, 'en.yaml'))
-        # rubocop:disable Style/FormatStringToken
-        expect(trans_data['en']['welcome']).to eq('Welcome to the app, %{username}')
-        # rubocop:enable Style/FormatStringToken
+        expect(count_translations).to eq(4)
       end
 
       it 'handles newlines properly', slow: true do
@@ -130,18 +131,32 @@ describe LokaliseManager::TaskDefinitions::Importer do
                                        api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
                                        import_opts: {replace_breaks: false}
 
+        allow(importer).to receive(:download_files).and_return(
+          {
+            'project_id' => '123.abc',
+            'bundle_url' => local_trans_slashes
+          }
+        )
+
         VCR.use_cassette('import_breaks') do
           expect { importer.import! }.to output(/complete!/).to_stdout
         end
 
         trans_data = YAML.load_file(File.join(loc_path, 'en.yml'))
-        expect(trans_data['en']['hello_html']).to eq("<h1>\nhello world\n</h1>\n")
+        expect(trans_data['en']['hi_html']).to eq("<h1>\nhello world\n</h1>\n\n")
       end
 
       it 'handles backslashes properly' do
         importer = described_class.new project_id: '913601666308c64dc13bb9.52811572',
                                        api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
                                        max_retries_import: 2
+
+        allow(importer).to receive(:download_files).and_return(
+          {
+            'project_id' => '123.abc',
+            'bundle_url' => local_trans_slashes
+          }
+        )
 
         VCR.use_cassette('import_backslashes') do
           expect { importer.import! }.to output(/complete!/).to_stdout
@@ -152,6 +167,13 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'runs import successfully but does not provide any output when silent_mode is enabled' do
+        allow(described_object).to receive(:download_files).and_return(
+          {
+            'project_id' => '123.abc',
+            'bundle_url' => local_trans
+          }
+        )
+
         allow(described_object.config).to receive(:silent_mode).and_return(true)
         result = nil
 
@@ -160,8 +182,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         end
 
         expect(result).to be true
-        expect_file_exist loc_path, 'en.yaml'
-        expect_file_exist loc_path, 'fr.yaml'
+        expect_file_exist loc_path, 'en/nested/main_en.yml'
         expect(described_object.config).to have_received(:silent_mode).at_most(1).times
       end
     end

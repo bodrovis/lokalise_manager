@@ -47,7 +47,7 @@ module LokaliseManager
           fetch_zip_entries(zip) { |entry| process!(entry) }
         end
       rescue StandardError => e
-        raise e.class, "There was an error when trying to process the downloaded files: #{e.message}"
+        raise(e.class, "There was an error when trying to process the downloaded files: #{e.message}")
       end
 
       # Iterates over ZIP entries. Each entry may be a file or folder.
@@ -92,6 +92,7 @@ module LokaliseManager
       # @return [String]
       def open_file_or_remote(path)
         parsed_path = URI.parse(path)
+
         if parsed_path&.scheme&.include?('http')
           parsed_path.open
         else
