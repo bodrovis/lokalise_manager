@@ -7,8 +7,9 @@ AllCops:
   TargetRubyVersion: 2.7
   NewCops: enable
   Exclude:
-    - 'spec/dummy/bin/*'
-    - '*.md'
+    - vendor/**
+    - vendor/bundle/**/*
+    - bin/**
 
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
