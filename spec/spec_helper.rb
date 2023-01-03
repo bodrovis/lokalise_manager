@@ -8,11 +8,6 @@ SimpleCov.start do
   add_filter '.github/'
 end
 
-if ENV['CI'] == 'true'
-  require 'codecov'
-  SimpleCov.formatter = SimpleCov::Formatter::Codecov
-end
-
 require 'lokalise_manager'
 
 # Support files
