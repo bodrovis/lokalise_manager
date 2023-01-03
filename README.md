@@ -1,7 +1,6 @@
 # LokaliseManager
 
 ![Gem](https://img.shields.io/gem/v/lokalise_manager)
-![CI](https://github.com/bodrovis/lokalise_manager/actions/workflows/ci.yml/badge.svg)
 [![Test Coverage](https://codecov.io/gh/bodrovis/lokalise_manager/graph/badge.svg)](https://codecov.io/gh/bodrovis/lokalise_manager)
 ![Downloads total](https://img.shields.io/gem/dt/lokalise_manager)
 
