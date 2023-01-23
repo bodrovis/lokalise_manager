@@ -1,7 +1,7 @@
 # LokaliseManager
 
 ![Gem](https://img.shields.io/gem/v/lokalise_manager)
-[![Test Coverage](https://codecov.io/gh/bodrovis/lokalise_manager/graph/badge.svg)](https://codecov.io/gh/bodrovis/lokalise_manager)
+![CI](https://github.com/bodrovis/lokalise_manager/actions/workflows/ci.yml/badge.svg)
 ![Downloads total](https://img.shields.io/gem/dt/lokalise_manager)
 
 This gem provides [Lokalise](http://lokalise.com) integration for Ruby and allows to exchange translation files between your project and TMS easily. It relies on [ruby-lokalise-api](https://lokalise.github.io/ruby-lokalise-api) to send APIv2 requests.
