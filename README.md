@@ -301,4 +301,4 @@ importer.import!
 
 ## License
 
-Copyright (c) [Lokalise team](http://lokalise.com), [Ilya Krukowski](http://bodrovis.tech). License type is [MIT](https://github.com/bodrovis/lokalise_manager/blob/master/LICENSE).
+Copyright (c) [Ilya Krukowski](http://bodrovis.tech). License type is [MIT](https://github.com/bodrovis/lokalise_manager/blob/master/LICENSE).
