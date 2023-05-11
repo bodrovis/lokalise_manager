@@ -6,13 +6,6 @@ require:
 AllCops:
   TargetRubyVersion: 2.7
   NewCops: enable
-  Exclude:
-    - vendor/**
-    - vendor/bundle/**/*
-    - bin/**
-
-Layout/SpaceInsideHashLiteralBraces:
-  EnforcedStyle: no_space
 
 Metrics/BlockLength:
   Max: 36
@@ -20,52 +13,8 @@ Metrics/BlockLength:
     - spec/**/*.rb
     - lokalise_manager.gemspec
 
-Metrics/BlockNesting:
-  Max: 2
-
-Metrics/AbcSize:
-  Max: 18
-  
-Layout/LineLength:
-  AllowURI: true
-  Exclude:
-    - lokalise_manager.gemspec
-
-Metrics/MethodLength:
-  CountComments: false
-  Max: 15
-
-Metrics/ModuleLength:
-  Max: 120
-
-Metrics/ClassLength:
-  Max: 120
-
-Metrics/ParameterLists:
-  Max: 5
-  CountKeywordArgs: true
-
-Style/CollectionMethods:
-  Enabled: true
-  PreferredMethods:
-    collect:  'map'
-    collect!: 'map!'
-    inject:   'reduce'
-    find:     'detect'
-    find_all: 'select'
-    delete:   'gsub'
-
-Layout/DotPosition:
-  EnforcedStyle: trailing
-
-Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: 'no_comma'
-
-Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: 'no_comma'
-
 RSpec/MultipleExpectations:
-  Max: 30
+  Max: 10
 
 RSpec/ExampleLength:
   Max: 35
@@ -75,3 +24,6 @@ RSpec/NestedGroups:
 
 RSpec/MultipleMemoizedHelpers:
   Max: 10
+
+Metrics/AbcSize:
+  Max: 18

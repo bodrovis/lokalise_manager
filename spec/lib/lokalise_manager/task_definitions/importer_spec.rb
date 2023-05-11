@@ -8,31 +8,48 @@ describe LokaliseManager::TaskDefinitions::Importer do
   end
   let(:loc_path) { described_object.config.locales_path }
   let(:project_id) { ENV.fetch('LOKALISE_PROJECT_ID', nil) }
-  let(:local_trans) { "#{Dir.getwd}/spec/fixtures/trans.zip" }
-  let(:local_trans_slashes) { "#{Dir.getwd}/spec/fixtures/trans_slashes.zip" }
+  let(:local_trans) { "#{Dir.getwd}/spec/fixtures/response_files/trans.zip" }
+  let(:local_trans_slashes) { "#{Dir.getwd}/spec/fixtures/response_files/trans_slashes.zip" }
+  let(:common_params) do
+    {
+      format: 'ruby_yaml',
+      placeholder_format: 'icu',
+      yaml_include_root: true,
+      original_filenames: true,
+      directory_prefix: '',
+      indentation: '2sp'
+    }
+  end
 
   describe '#open_and_process_zip' do
     it 're-raises errors during file processing' do
       entry = double
       allow(entry).to receive(:name).and_return('fail.yml')
       allow(described_object).to receive(:data_from).with(entry).and_raise(EncodingError)
-      expect { described_object.send(:process!, entry) }.
-        to raise_error(EncodingError, /Error when trying to process fail\.yml/)
+      expect { described_object.send(:process!, entry) }
+        .to raise_error(EncodingError, /Error when trying to process fail\.yml/)
 
       expect(described_object).to have_received(:data_from)
     end
 
     it 're-raises errors during file opening' do
-      expect { described_object.send(:open_and_process_zip, 'http://fake.url/wrong/path.zip') }.
-        to raise_error(SocketError, /Failed to open TCP connection/)
+      fake_path = 'http://fake.url/wrong/path.zip'
+
+      stub_request(
+        :get,
+        fake_path
+      ).to_raise(SocketError.new('Failed to open TCP connection'))
+
+      expect { described_object.send(:open_and_process_zip, fake_path) }
+        .to raise_error(SocketError, /Failed to open TCP connection/)
     end
   end
 
   describe '#download_files' do
     it 'returns a proper download URL' do
-      response = VCR.use_cassette('download_files') do
-        described_object.send :download_files
-      end
+      stub_download(common_params, 'download_files.json')
+
+      response = described_object.send :download_files
 
       expect(response['project_id']).to eq('672198945b7d72fc048021.15940510')
       expect(response['bundle_url']).to include('s3-eu-west-1.amazonaws.com')
@@ -41,10 +58,10 @@ describe LokaliseManager::TaskDefinitions::Importer do
     it 're-raises errors during file download' do
       allow_project_id described_object, 'invalid'
 
-      VCR.use_cassette('download_files_error') do
-        expect { described_object.send :download_files }.
-          to raise_error(RubyLokaliseApi::Error::BadRequest, /Invalid `project_id` parameter/)
-      end
+      stub_download(common_params, 'invalid_project_id.json', status: 400, project_id: 'invalid')
+
+      expect { described_object.send :download_files }
+        .to raise_error(RubyLokaliseApi::Error::BadRequest, /Invalid `project_id` parameter/)
     end
   end
 
@@ -117,9 +134,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
         result = nil
 
-        VCR.use_cassette('import') do
-          expect { result = described_object.import! }.to output(/complete!/).to_stdout
-        end
+        stub_download(common_params, 'import.json')
+
+        expect { result = described_object.import! }.to output(/complete!/).to_stdout
 
         expect(result).to be true
 
@@ -129,7 +146,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
       it 'handles newlines properly', slow: true do
         importer = described_class.new project_id: '913601666308c64dc13bb9.52811572',
                                        api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
-                                       import_opts: {replace_breaks: false}
+                                       import_opts: { replace_breaks: false }
 
         allow(importer).to receive(:download_files).and_return(
           {
@@ -138,9 +155,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
           }
         )
 
-        VCR.use_cassette('import_breaks') do
-          expect { importer.import! }.to output(/complete!/).to_stdout
-        end
+        stub_download(common_params.merge({ replace_breaks: false }), 'import.json')
+
+        expect { importer.import! }.to output(/complete!/).to_stdout
 
         trans_data = YAML.load_file(File.join(loc_path, 'en.yml'))
         expect(trans_data['en']['hi_html']).to eq("<h1>\nhello world\n</h1>\n\n")
@@ -158,9 +175,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
           }
         )
 
-        VCR.use_cassette('import_backslashes') do
-          expect { importer.import! }.to output(/complete!/).to_stdout
-        end
+        stub_download(common_params, 'import.json')
+
+        expect { importer.import! }.to output(/complete!/).to_stdout
 
         trans_data = YAML.load_file(File.join(loc_path, 'en.yml'))
         expect(trans_data['en']['hello_html']).to eq("<h1>\nhello\nworld\n</h1>\n")
@@ -177,9 +194,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
         allow(described_object.config).to receive(:silent_mode).and_return(true)
         result = nil
 
-        VCR.use_cassette('import') do
-          expect { result = described_object.import! }.not_to output(/complete!/).to_stdout
-        end
+        stub_download(common_params, 'import.json')
+
+        expect { result = described_object.import! }.not_to output(/complete!/).to_stdout
 
         expect(result).to be true
         expect_file_exist loc_path, 'en/nested/main_en.yml'

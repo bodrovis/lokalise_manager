@@ -8,7 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors               = ['Ilya Krukowski']
   spec.email                 = ['golosizpru@gmail.com']
   spec.summary               = 'Lokalise integration for Ruby'
-  spec.description           = 'This gem contains a collection of some common tasks for Lokalise. Specifically, it allows to import/export translation files from/to Lokalise TMS.'
+  spec.description           = 'This gem contains a collection of some common tasks for Lokalise. Specifically, ' \
+                               'it allows to import/export translation files from/to Lokalise TMS.'
   spec.homepage              = 'https://github.com/bodrovis/lokalise_manager'
   spec.license               = 'MIT'
   spec.platform              = Gem::Platform::RUBY
@@ -35,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-rspec', '~> 2.6'
   spec.add_development_dependency 'simplecov', '~> 0.16'
   spec.add_development_dependency 'simplecov-lcov', '~> 0.8'
-  spec.add_development_dependency 'vcr', '~> 6.0'
+  spec.add_development_dependency 'webmock', '~> 3.18'
   spec.metadata = {
     'rubygems_mfa_required' => 'true'
   }

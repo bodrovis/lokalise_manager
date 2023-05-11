@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Replace VCR with WebMock in tests
+* Various minor updates
+
 ## 3.3.0 (18-Nov-22)
 
 * Use newer ruby-lokalise-api

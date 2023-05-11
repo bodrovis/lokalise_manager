@@ -2,6 +2,7 @@
 
 require 'dotenv/load'
 require 'simplecov'
+require 'webmock/rspec'
 
 SimpleCov.start do
   if ENV['CI']
@@ -19,12 +20,12 @@ SimpleCov.start do
   add_filter '.github/'
 end
 
-require 'lokalise_manager'
+require_relative '../lib/lokalise_manager'
 
-# Support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.include FileManager
   config.include SpecAddons
+  config.include Stubs
 end

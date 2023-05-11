@@ -3,9 +3,8 @@
 require 'base64'
 
 describe LokaliseManager::TaskDefinitions::Exporter do
-  let(:filename) { 'en.yml' }
-  let(:path) { "#{Dir.getwd}/locales/nested/#{filename}" }
-  let(:relative_name) { "nested/#{filename}" }
+  let(:path) { "#{Dir.getwd}/locales/nested/en.yml" }
+  let(:relative_name) { 'nested/en.yml' }
   let(:project_id) { ENV.fetch('LOKALISE_PROJECT_ID', nil) }
   let(:described_object) do
     described_class.new project_id: project_id,
@@ -15,9 +14,9 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
   context 'with many translation files' do
     describe '.export!' do
-      context 'with no errors' do
+      context 'with three files' do
         before do
-          add_translation_files! with_ru: true, additional: 5
+          add_translation_files! with_ru: true, additional: 1
         end
 
         after do
@@ -27,12 +26,37 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         it 'sends a proper API request and handles rate limiting' do
           process = nil
 
-          VCR.use_cassette('upload_files_multiple') do
-            expect { process = described_object.export!.first.process }.to output(/complete!/).to_stdout
-          end
+          stub_upload({
+                        data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                        filename: 'nested/en.yml',
+                        lang_iso: 'en'
+                      }, 'upload_nested.json')
+
+          stub_upload({
+                        data: 'cnVfUlU6CiAgbXlfa2V5OiAi0JzQvtGRINC30L3QsNGH0LXQvdC40LUiCiAgbmVzdGVkOgog' \
+                              'ICAga2V5OiAi0JfQvdCw0YfQtdC90LjQtSAyIg==',
+                        filename: 'ru.yml',
+                        lang_iso: 'ru_RU'
+                      }, 'upload_ru.json')
+
+          stub_upload({
+                        data: 'LS0tCmVuOgogIGtleV8wOiB2YWx1ZSAw', filename: 'en_0.yml', lang_iso: 'en'
+                      }, 'upload0.json')
+
+          expect { process = described_object.export!.first.process }.to output(/complete!/).to_stdout
 
           expect(process.project_id).to eq(project_id)
           expect(process.status).to eq('queued')
+        end
+      end
+
+      context 'with seven files' do
+        before do
+          add_translation_files! with_ru: true, additional: 5
+        end
+
+        after do
+          rm_translation_files
         end
 
         it 'handles too many requests but does not re-raise anything when raise_on_export_fail is false' do
@@ -118,18 +142,26 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
           process = nil
 
-          VCR.use_cassette('upload_files') do
-            expect { process = described_object.export!.first.process }.not_to output(/complete!/).to_stdout
-          end
+          stub_upload({
+                        data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                        filename: 'nested/en.yml',
+                        lang_iso: 'en'
+                      }, 'upload_nested.json')
+
+          expect { process = described_object.export!.first.process }.not_to output(/complete!/).to_stdout
 
           expect(process.status).to eq('queued')
           expect(described_object.config).to have_received(:silent_mode).at_most(1).times
         end
 
         it 'sends a proper API request' do
-          process = VCR.use_cassette('upload_files') do
-            described_object.export!
-          end.first.process
+          stub_upload({
+                        data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                        filename: 'nested/en.yml',
+                        lang_iso: 'en'
+                      }, 'upload_nested.json')
+
+          process = described_object.export!.first.process
 
           expect(process.project_id).to eq(project_id)
           expect(process.status).to eq('queued')
@@ -138,9 +170,13 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         it 'sends a proper API request when a different branch is provided' do
           allow(described_object.config).to receive(:branch).and_return('develop')
 
-          process_data = VCR.use_cassette('upload_files_branch') do
-            described_object.export!
-          end.first
+          stub_upload({
+                        data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                        filename: 'nested/en.yml',
+                        lang_iso: 'en'
+                      }, 'upload_nested.json', project_id: "#{ENV.fetch('LOKALISE_PROJECT_ID', nil)}:develop")
+
+          process_data = described_object.export!.first
 
           expect(described_object.config).to have_received(:branch).at_most(2).times
           expect(process_data.success).to be true
@@ -222,11 +258,20 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
     describe '.export!' do
       it 're-raises export errors' do
-        allow_project_id described_object, '542886116159f798720dc4.94769464'
+        stub_upload({
+                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                      filename: 'nested/en.yml',
+                      lang_iso: 'en'
+                    }, 'upload_nested.json')
 
-        VCR.use_cassette('upload_files_error') do
-          expect { described_object.export! }.to raise_error(RubyLokaliseApi::Error::BadRequest, /Unknown `lang_iso`/)
-        end
+        stub_upload({
+                      data: 'cnVfUlU6CiAgbXlfa2V5OiAi0JzQvtGRINC30L3QsNGH0LXQvdC40LUiCiAgbmVzdGVkOgog' \
+                            'ICAga2V5OiAi0JfQvdCw0YfQtdC90LjQtSAyIg==',
+                      filename: 'ru.yml',
+                      lang_iso: 'ru_RU'
+                    }, 'unknown_lang_iso.json', status: 400)
+
+        expect { described_object.export! }.to raise_error(RubyLokaliseApi::Error::BadRequest, /Unknown `lang_iso`/)
       end
     end
 

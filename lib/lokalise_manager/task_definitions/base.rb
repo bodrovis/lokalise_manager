@@ -17,10 +17,10 @@ module LokaliseManager
       # @param custom_opts [Hash]
       # @param global_config [Object]
       def initialize(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
-        primary_opts = global_config.
-                       singleton_methods.
-                       filter { |m| m.to_s.end_with?('=') }.
-                       each_with_object({}) do |method, opts|
+        primary_opts = global_config
+                       .singleton_methods
+                       .filter { |m| m.to_s.end_with?('=') }
+                       .each_with_object({}) do |method, opts|
           reader = method.to_s.delete_suffix('=')
           opts[reader.to_sym] = global_config.send(reader)
         end

@@ -32,7 +32,7 @@ module FileManager
     return unless additional
 
     additional.times do |i|
-      data = {'en' => {"key_#{i}" => "value #{i}"}}
+      data = { 'en' => { "key_#{i}" => "value #{i}" } }
 
       open_and_write("locales/en_#{i}.yml") { |f| f.write data.to_yaml }
     end
