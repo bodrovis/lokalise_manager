@@ -1,9 +1,11 @@
 # Changelog
 
-## Unreleased
+## 4.0.0
 
+* **Use ruby-lokalise-api version 8**. It should not introduce any breaking changes (as main methods have similar signatures) but you should be aware that v8 is a complete rewrite of the original SDK so please make sure your tests pass.
 * Replace VCR with WebMock in tests
 * Various minor updates
+* Do not test with Ruby 2.7 (EOL)
 
 ## 3.3.0 (18-Nov-22)
 
