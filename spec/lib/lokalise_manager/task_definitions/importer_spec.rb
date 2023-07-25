@@ -108,11 +108,12 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'runs import successfully for local files' do
+        data = {
+          'project_id' => '123.abc',
+          'bundle_url' => local_trans
+        }
         allow(described_object).to receive(:download_files).and_return(
-          {
-            'project_id' => '123.abc',
-            'bundle_url' => local_trans
-          }
+          RubyLokaliseApi::Generics::DownloadBundle.new(data)
         )
 
         expect(described_object.import!).to be true
@@ -125,11 +126,12 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'runs import successfully' do
+        data = {
+          'project_id' => '123.abc',
+          'bundle_url' => local_trans
+        }
         allow(described_object).to receive(:download_files).and_return(
-          {
-            'project_id' => '123.abc',
-            'bundle_url' => local_trans
-          }
+          RubyLokaliseApi::Generics::DownloadBundle.new(data)
         )
 
         result = nil
@@ -148,12 +150,12 @@ describe LokaliseManager::TaskDefinitions::Importer do
                                        api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
                                        import_opts: { replace_breaks: false }
 
-        allow(importer).to receive(:download_files).and_return(
-          {
-            'project_id' => '123.abc',
-            'bundle_url' => local_trans_slashes
-          }
-        )
+        data = {
+          'project_id' => '123.abc',
+          'bundle_url' => local_trans_slashes
+        }
+
+        allow(importer).to receive(:download_files).and_return(RubyLokaliseApi::Generics::DownloadBundle.new(data))
 
         stub_download(common_params.merge({ replace_breaks: false }), 'import.json')
 
@@ -168,12 +170,11 @@ describe LokaliseManager::TaskDefinitions::Importer do
                                        api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
                                        max_retries_import: 2
 
-        allow(importer).to receive(:download_files).and_return(
-          {
-            'project_id' => '123.abc',
-            'bundle_url' => local_trans_slashes
-          }
-        )
+        data = {
+          'project_id' => '123.abc',
+          'bundle_url' => local_trans_slashes
+        }
+        allow(importer).to receive(:download_files).and_return(RubyLokaliseApi::Generics::DownloadBundle.new(data))
 
         stub_download(common_params, 'import.json')
 
@@ -184,11 +185,13 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'runs import successfully but does not provide any output when silent_mode is enabled' do
+        data = {
+          'project_id' => '123.abc',
+          'bundle_url' => local_trans
+        }
+
         allow(described_object).to receive(:download_files).and_return(
-          {
-            'project_id' => '123.abc',
-            'bundle_url' => local_trans
-          }
+          RubyLokaliseApi::Generics::DownloadBundle.new(data)
         )
 
         allow(described_object.config).to receive(:silent_mode).and_return(true)
@@ -222,12 +225,11 @@ describe LokaliseManager::TaskDefinitions::Importer do
       end
 
       it 'import proceeds when the user agrees' do
-        allow(safe_mode_obj).to receive(:download_files).and_return(
-          {
-            'project_id' => '123.abc',
-            'bundle_url' => local_trans
-          }
-        )
+        data = {
+          'project_id' => '123.abc',
+          'bundle_url' => local_trans
+        }
+        allow(safe_mode_obj).to receive(:download_files).and_return(RubyLokaliseApi::Generics::DownloadBundle.new(data))
 
         allow($stdin).to receive(:gets).and_return('Y')
         expect { safe_mode_obj.import! }.to output(/is not empty/).to_stdout

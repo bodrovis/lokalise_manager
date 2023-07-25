@@ -19,7 +19,7 @@ module LokaliseManager
           return false
         end
 
-        open_and_process_zip download_files['bundle_url']
+        open_and_process_zip download_files.bundle_url
 
         $stdout.print('Task complete!') unless config.silent_mode
         true
