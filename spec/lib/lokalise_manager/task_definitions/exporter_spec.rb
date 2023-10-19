@@ -60,14 +60,12 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         end
 
         it 'handles too many requests but does not re-raise anything when raise_on_export_fail is false' do
-          allow(described_object.config).to receive(:max_retries_export).and_return(1)
-          allow(described_object.config).to receive(:raise_on_export_fail).and_return(false)
-          allow(described_object).to receive(:sleep).and_return(0)
+          allow(described_object.config).to receive_messages(max_retries_export: 1, raise_on_export_fail: false)
 
           fake_client = instance_double(RubyLokaliseApi::Client)
           allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
           allow(fake_client).to receive(:upload_file).with(any_args).and_raise(RubyLokaliseApi::Error::TooManyRequests)
-          allow(described_object).to receive(:api_client).and_return(fake_client)
+          allow(described_object).to receive_messages(sleep: 0, api_client: fake_client)
           processes = []
           expect { processes = described_object.export! }.not_to raise_error
 
@@ -92,12 +90,11 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
         it 'handles too many requests' do
           allow(described_object.config).to receive(:max_retries_export).and_return(1)
-          allow(described_object).to receive(:sleep).and_return(0)
 
           fake_client = instance_double(RubyLokaliseApi::Client)
           allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
           allow(fake_client).to receive(:upload_file).with(any_args).and_raise(RubyLokaliseApi::Error::TooManyRequests)
-          allow(described_object).to receive(:api_client).and_return(fake_client)
+          allow(described_object).to receive_messages(sleep: 0, api_client: fake_client)
 
           expect do
             described_object.export!

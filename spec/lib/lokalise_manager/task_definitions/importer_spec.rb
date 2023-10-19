@@ -68,11 +68,9 @@ describe LokaliseManager::TaskDefinitions::Importer do
   describe '.import!' do
     context 'with errors' do
       it 'handles too many requests' do
-        allow(described_object).to receive(:sleep).and_return(0)
-
         fake_client = instance_double(RubyLokaliseApi::Client)
         allow(fake_client).to receive(:download_files).and_raise(RubyLokaliseApi::Error::TooManyRequests)
-        allow(described_object).to receive(:api_client).and_return(fake_client)
+        allow(described_object).to receive_messages(sleep: 0, api_client: fake_client)
 
         expect do
           described_object.import!
@@ -145,7 +143,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         expect(count_translations).to eq(4)
       end
 
-      it 'handles newlines properly', slow: true do
+      it 'handles newlines properly', :slow do
         importer = described_class.new project_id: '913601666308c64dc13bb9.52811572',
                                        api_token: ENV.fetch('LOKALISE_API_TOKEN', nil),
                                        import_opts: { replace_breaks: false }
