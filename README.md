@@ -14,7 +14,7 @@ If you are looking for a Rails integration, please check [lokalise_rails](https:
 
 ### Requirements
 
-This gem requires Ruby 2.5+. You will also need to [setup a Lokalise account](https://app.lokalise.com/signup) and create a [translation project](https://docs.lokalise.com/en/articles/1400460-projects). Finally, you will need to generate a [read/write API token](https://docs.lokalise.com/en/articles/1929556-api-tokens) at your Lokalise profile.
+This gem requires Ruby 3.0+. You will also need to [setup a Lokalise account](https://app.lokalise.com/signup) and create a [translation project](https://docs.lokalise.com/en/articles/1400460-projects). Finally, you will need to generate a [read/write API token](https://docs.lokalise.com/en/articles/1929556-api-tokens) at your Lokalise profile.
 
 Alternatively, you can utilize a token obtained via OAuth 2 flow. When using such a token, you'll have to set `:use_oauth2_token` option to `true` (see below).
 
