@@ -1,5 +1,16 @@
 # Changelog
 
+## 5.0.0 (09-Nov-2023)
+
+* **Breaking change**: require Ruby 3+. Version 2.7 has reached end-of-life and thus we are not planning to support it anymore. If you need support for Ruby 2.7, please stay on 4.0.0.
+* **Potential breaking change**: lambda returned by the `lang_iso_inferer` method has been slightly enhanced. It now accepts not only the file data but also the full path to the file. Therefore, if you redefine the `lang_iso_inferer` option please make sure that the returned lambda accepts two params, not one. This way, you can be more flexible when inferring the locale. For example:
+
+```ruby
+lang_iso_inferer: ->(_data, path) { path.basename('.yml').to_s }
+```
+
+* Use ruby-lokalise-api v9.0.0
+
 ## 4.0.0 (27-Jul-2023)
 
 * **Use ruby-lokalise-api version 8**. It should not introduce any breaking changes (as main methods have similar signatures) but you should be aware that v8 is a complete rewrite of the original SDK so please make sure your tests pass.

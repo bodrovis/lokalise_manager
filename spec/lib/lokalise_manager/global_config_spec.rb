@@ -124,7 +124,7 @@ describe LokaliseManager::GlobalConfig do
   end
 
   it 'is possible to set lang_iso_inferer' do
-    runner = ->(f) { f.to_json }
+    runner = ->(f, _) { f.to_json }
     allow(fake_class).to receive(:lang_iso_inferer=).with(runner)
     fake_class.lang_iso_inferer = runner
     expect(fake_class).to have_received(:lang_iso_inferer=)

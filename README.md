@@ -203,7 +203,7 @@ If your translation files are not in YAML format, you will need to adjust the fo
 * `file_ext_regexp` (`regexp`) — regular expression applied to file extensions to determine which files should be imported and exported. Defaults to `/\.ya?ml\z/i` (YAML files).
 * `translations_loader` (`lambda` or `proc`) — loads translations data and makes sure they are valid before saving them to a translation file. Defaults to `->(raw_data) { YAML.safe_load raw_data }`. In the simplest case you may just return the data back, for example `-> (raw_data) { raw_data }`.
 * `translations_converter` (`lambda` or `proc`) — converts translations data to a proper format before saving them to a translation file. Defaults to `->(raw_data) { YAML.dump(raw_data).gsub(/\\\\n/, '\n') }`. In the simplest case you may just return the data back, for example `-> (raw_data) { raw_data }`.
-* `lang_iso_inferer` (`lambda` or `proc`) — infers language ISO code based on the translation file data before uploading it to Lokalise. Defaults to `->(data) { YAML.safe_load(data)&.keys&.first }`.
+* `lang_iso_inferer` (`lambda` or `proc`) — infers language ISO code based on the translation file data and path before uploading it to Lokalise. Defaults to `->(data, _path) { YAML.safe_load(data)&.keys&.first }`. To infer locale based on the filename, you can use something like `->(_data, path) { path.basename('.yml').to_s }`. `path` is an instance of the `Pathname` class.
 
 ### Customizing JSON parser and network adapter
 

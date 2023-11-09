@@ -84,7 +84,7 @@ module LokaliseManager
         initial_opts = {
           data: Base64.strict_encode64(content.strip),
           filename: relative_p,
-          lang_iso: config.lang_iso_inferer.call(content)
+          lang_iso: config.lang_iso_inferer.call(content, full_p)
         }
 
         initial_opts.merge config.export_opts

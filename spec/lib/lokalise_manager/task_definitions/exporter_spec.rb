@@ -184,6 +184,20 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           expect(process.project_id).to eq(project_id)
           expect(process.status).to eq('queued')
         end
+
+        it 'can infer locale based on the path' do
+          allow(described_object.config).to receive(:lang_iso_inferer).and_return(
+            ->(_data, path) { path.basename('.yml').to_s }
+          )
+
+          paths = described_object.send(:all_files).flatten
+          opts = described_object.send(:opts, *paths)
+
+          expect(opts[:filename].to_s).to eq('nested/en.yml')
+          expect(opts[:lang_iso].to_s).to eq('en')
+
+          expect(described_object.config).to have_received(:lang_iso_inferer)
+        end
       end
     end
 

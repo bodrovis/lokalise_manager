@@ -99,8 +99,10 @@ module LokaliseManager
       end
 
       # Infers lang ISO for the given translation file
+      # The lambda expects to accept the raw contents of the translation file
+      # and the full path to the file (instance of the `Pathname` class)
       def lang_iso_inferer
-        @lang_iso_inferer || ->(data) { YAML.safe_load(data)&.keys&.first }
+        @lang_iso_inferer || ->(data, _path) { YAML.safe_load(data)&.keys&.first }
       end
     end
   end
