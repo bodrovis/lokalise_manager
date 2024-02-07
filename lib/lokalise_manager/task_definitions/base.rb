@@ -88,10 +88,10 @@ module LokaliseManager
         "#{config.project_id}:#{config.branch}"
       end
 
+      EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests]
+      
       # Sends request with exponential backoff mechanism
       def with_exp_backoff(max_retries)
-        EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests]
-
         return unless block_given?
 
         retries = 0
