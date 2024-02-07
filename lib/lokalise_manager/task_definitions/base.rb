@@ -90,12 +90,14 @@ module LokaliseManager
 
       # Sends request with exponential backoff mechanism
       def with_exp_backoff(max_retries)
+        EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests]
+
         return unless block_given?
 
         retries = 0
         begin
           yield
-        rescue RubyLokaliseApi::Error::TooManyRequests => e
+        rescue *EXCEPTIONS => e
           raise(e.class, "Gave up after #{retries} retries") if retries >= max_retries
 
           sleep 2**retries
