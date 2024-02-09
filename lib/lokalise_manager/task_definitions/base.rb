@@ -88,6 +88,11 @@ module LokaliseManager
         "#{config.project_id}:#{config.branch}"
       end
 
+      # In rare cases the server might return HTML instead of JSON.
+      # It happens when too many requests are being sent.
+      # Until this is fixed, we revert to this quick'n'dirty solution.
+      EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests].freeze
+
       # Sends request with exponential backoff mechanism
       def with_exp_backoff(max_retries)
         return unless block_given?
@@ -95,7 +100,7 @@ module LokaliseManager
         retries = 0
         begin
           yield
-        rescue RubyLokaliseApi::Error::TooManyRequests => e
+        rescue *EXCEPTIONS => e
           raise(e.class, "Gave up after #{retries} retries") if retries >= max_retries
 
           sleep 2**retries
