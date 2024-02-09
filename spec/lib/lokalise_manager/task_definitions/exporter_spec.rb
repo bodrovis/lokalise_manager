@@ -77,6 +77,25 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           expect(described_object).to have_received(:api_client).at_least(14).times
           expect(fake_client).to have_received(:upload_file).exactly(14).times
         end
+
+        it 'handles non-json responses but does not re-raise anything when raise_on_export_fail is false' do
+          allow(described_object.config).to receive_messages(max_retries_export: 1, raise_on_export_fail: false)
+
+          fake_client = instance_double(RubyLokaliseApi::Client)
+          allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
+          allow(fake_client).to receive(:upload_file).with(any_args).and_raise(JSON::ParserError)
+          allow(described_object).to receive_messages(sleep: 0, api_client: fake_client)
+          processes = []
+          expect { processes = described_object.export! }.not_to raise_error
+
+          expect(processes[0].success).to be false
+          expect(processes[1].error.class).to eq(JSON::ParserError)
+          expect(processes.count).to eq(7)
+
+          expect(described_object).to have_received(:sleep).exactly(7).times
+          expect(described_object).to have_received(:api_client).at_least(14).times
+          expect(fake_client).to have_received(:upload_file).exactly(14).times
+        end
       end
 
       context 'with errors' do
