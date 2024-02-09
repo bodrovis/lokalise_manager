@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.1.0 (09-Feb-2024)
+
+* Handle rare case when the server returns HTML instead of JSON which happens when too many requests are sent
+
 ## 5.0.0 (09-Nov-2023)
 
 * **Breaking change**: require Ruby 3+. Version 2.7 has reached end-of-life and thus we are not planning to support it anymore. If you need support for Ruby 2.7, please stay on 4.0.0.
