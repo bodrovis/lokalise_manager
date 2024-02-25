@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubyzip', '~> 2.3'
   spec.add_dependency 'zeitwerk', '~> 2.4'
 
-  spec.add_development_dependency 'dotenv', '~> 2.5'
+  spec.add_development_dependency 'dotenv', '~> 3.0'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.6'
   spec.add_development_dependency 'rubocop', '~> 1.0'
