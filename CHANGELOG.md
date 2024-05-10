@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.1.1
+## 5.1.1 (10-May-2024)
 
 * Update documentation, minor code fixes
 
