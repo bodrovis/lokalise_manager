@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.1.1
+
+* Update documentation, minor code fixes
+
 ## 5.1.0 (09-Feb-2024)
 
 * Handle rare case when the server returns HTML instead of JSON which happens when too many requests are sent

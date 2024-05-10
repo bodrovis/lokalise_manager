@@ -4,14 +4,14 @@ require 'base64'
 
 module LokaliseManager
   module TaskDefinitions
-    # Exporter class is used when you want to upload translation files from your project to Lokalise
+    # Class to handle exporting translation files from a local project to Lokalise.
     class Exporter < Base
-      # Lokalise allows no more than 6 requests per second
+      # Maximum number of concurrent uploads to avoid exceeding Lokalise API rate limits.
       MAX_THREADS = 6
 
-      # Performs translation file export to Lokalise and returns an array of queued processes
+      # Exports translation files to Lokalise and handles any necessary concurrency and error checking.
       #
-      # @return [Array]
+      # @return [Array] An array of process statuses for each file uploaded.
       def export!
         check_options_errors!
 
@@ -25,16 +25,21 @@ module LokaliseManager
           end
         end
 
-        $stdout.print('Task complete!') unless config.silent_mode
+        print_completion_message unless config.silent_mode
 
         queued_processes
       end
 
       private
 
+      # Handles parallel uploads of a group of files, utilizing threading.
+      #
+      # @param files_group [Array] Group of files to be uploaded.
+      # @return [Array] Array of threads handling the file uploads.
+
       def parallel_upload(files_group)
         files_group.map do |file_data|
-          do_upload(*file_data)
+          Thread.new { do_upload(*file_data) }
         end.map(&:value)
       end
 
@@ -44,19 +49,26 @@ module LokaliseManager
         raise(thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}")
       end
 
-      # Performs the actual file uploading to Lokalise. If the API rate limit is exceeed,
-      # applies exponential backoff
+      # Performs the actual upload of a file to Lokalise.
+      #
+      # @param f_path [Pathname] Full path to the file.
+      # @param r_path [Pathname] Relative path of the file within the project.
+      # @return [Struct] A struct with the success status, process details, and any error information.
       def do_upload(f_path, r_path)
         proc_klass = Struct.new(:success, :process, :path, :error, keyword_init: true)
-
-        Thread.new do
+        begin
           process = with_exp_backoff(config.max_retries_export) do
-            api_client.upload_file project_id_with_branch, opts(f_path, r_path)
+            api_client.upload_file(project_id_with_branch, opts(f_path, r_path))
           end
-          proc_klass.new success: true, process: process, path: f_path
+          proc_klass.new(success: true, process: process, path: f_path)
         rescue StandardError => e
-          proc_klass.new success: false, path: f_path, error: e
+          proc_klass.new(success: false, path: f_path, error: e)
         end
+      end
+
+      # Prints a completion message to standard output.
+      def print_completion_message
+        $stdout.print('Task complete!')
       end
 
       # Gets translation files from the specified directory

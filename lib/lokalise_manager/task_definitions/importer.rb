@@ -6,11 +6,14 @@ require 'fileutils'
 
 module LokaliseManager
   module TaskDefinitions
-    # Importer class is used when you want to download translation files from Lokalise into your project
+    # The Importer class is responsible for downloading translation files from Lokalise
+    # and importing them into the specified project directory. This class extends the Base class,
+    # which provides shared functionality and configuration management.
     class Importer < Base
-      # Performs translation files import from Lokalise
+      # Initiates the import process by checking configuration, ensuring safe mode conditions,
+      # downloading files, and processing them. Outputs task completion status.
       #
-      # @return [Boolean]
+      # @return [Boolean] Returns true if the import completes successfully, false if cancelled.
       def import!
         check_options_errors!
 
@@ -27,10 +30,9 @@ module LokaliseManager
 
       private
 
-      # Downloads files from Lokalise using the specified config.
-      # Utilizes exponential backoff if "too many requests" error is received
+      # Downloads translation files from Lokalise, handling retries and errors using exponential backoff.
       #
-      # @return [Hash]
+      # @return [Hash] Returns the response from Lokalise API containing download details.
       def download_files
         with_exp_backoff(config.max_retries_import) do
           api_client.download_files project_id_with_branch, config.import_opts
@@ -39,45 +41,40 @@ module LokaliseManager
         raise e.class, "There was an error when trying to download files: #{e.message}"
       end
 
-      # Opens ZIP archive (local or remote) with translations and processes its entries
+      # Opens a ZIP archive from a given path and processes each entry if it matches the required file extension.
       #
-      # @param path [String]
+      # @param path [String] The URL or local path to the ZIP archive.
       def open_and_process_zip(path)
         Zip::File.open_buffer(open_file_or_remote(path)) do |zip|
-          fetch_zip_entries(zip) { |entry| process!(entry) }
+          zip.each do |entry|
+            next unless proper_ext?(entry.name)
+
+            process_entry(entry)
+          end
         end
       rescue StandardError => e
-        raise(e.class, "There was an error when trying to process the downloaded files: #{e.message}")
+        raise e.class, "Error processing ZIP file: #{e.message}"
       end
 
-      # Iterates over ZIP entries. Each entry may be a file or folder.
-      def fetch_zip_entries(zip)
-        return unless block_given?
-
-        zip.each do |entry|
-          next unless proper_ext? entry.name
-
-          yield entry
-        end
-      end
-
-      # Processes ZIP entry by reading its contents and creating the corresponding translation file
-      def process!(zip_entry)
-        data = data_from zip_entry
-        subdir, filename = subdir_and_filename_for zip_entry.name
-        full_path = "#{config.locales_path}/#{subdir}"
+      # Processes a single ZIP entry by extracting data, determining the correct directory structure,
+      # and writing the data to the appropriate file.
+      #
+      # @param zip_entry [Zip::Entry] The ZIP entry to process.
+      def process_entry(zip_entry)
+        data = data_from(zip_entry)
+        subdir, filename = subdir_and_filename_for(zip_entry.name)
+        full_path = File.join(config.locales_path, subdir)
         FileUtils.mkdir_p full_path
 
-        File.open(File.join(full_path, filename), 'w+:UTF-8') do |f|
-          f.write config.translations_converter.call(data)
-        end
+        File.write(File.join(full_path, filename), config.translations_converter.call(data), mode: 'w+:UTF-8')
       rescue StandardError => e
-        raise e.class, "Error when trying to process #{zip_entry&.name}: #{e.message}"
+        raise e.class, "Error processing entry #{zip_entry.name}: #{e.message}"
       end
 
-      # Checks whether the user wishes to proceed when safe mode is enabled and the target directory is not empty
+      # Determines if the import should proceed based on the safe mode setting and the content of the target directory.
+      # In safe mode, the directory must be empty, or the user must confirm continuation.
       #
-      # @return [Boolean]
+      # @return [Boolean] Returns true if the import should proceed, false otherwise.
       def proceed_when_safe_mode?
         return true unless config.import_safe_mode && !Dir.empty?(config.locales_path.to_s)
 
@@ -87,9 +84,10 @@ module LokaliseManager
         answer.to_s.strip == 'Y'
       end
 
-      # Opens a local file or a remote URL using the provided patf
+      # Opens a local file or a remote URL using the provided path, safely handling different path schemes.
       #
-      # @return [String]
+      # @param path [String] The path to the file, either a local path or a URL.
+      # @return [IO] Returns an IO object for the file.
       def open_file_or_remote(path)
         parsed_path = URI.parse(path)
 
@@ -100,6 +98,9 @@ module LokaliseManager
         end
       end
 
+      # Loads translations from the ZIP file.
+      #
+      # @param zip_entry [Zip::Entry] The ZIP entry to process.
       def data_from(zip_entry)
         config.translations_loader.call zip_entry.get_input_stream.read
       end

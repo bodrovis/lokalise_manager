@@ -5,17 +5,18 @@ require 'pathname'
 
 module LokaliseManager
   module TaskDefinitions
-    # Base class for LokaliseManager task definitions that includes common methods and logic
+    # Base class for LokaliseManager task definitions, including common methods and logic.
+    # This class serves as the foundation for importer and exporter classes, handling API
+    # client interactions and configuration merging.
     class Base
       using LokaliseManager::Utils::HashUtils
 
       attr_accessor :config
 
-      # Creates a new importer or exporter. It accepts custom config and merges it
-      # with the global config (custom config take precendence)
+      # Initializes a new task object by merging custom and global configurations.
       #
-      # @param custom_opts [Hash]
-      # @param global_config [Object]
+      # @param custom_opts [Hash] Custom configurations for specific tasks.
+      # @param global_config [Object] Reference to the global configuration.
       def initialize(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
         primary_opts = global_config
                        .singleton_methods
@@ -32,10 +33,12 @@ module LokaliseManager
         @config = config_klass.new all_opts
       end
 
-      # Creates a Lokalise API client
+      # Creates or retrieves a Lokalise API client based on configuration.
       #
-      # @return [RubyLokaliseApi::Client]
+      # @return [RubyLokaliseApi::Client] Lokalise API client.
       def api_client
+        return @api_client if @api_client
+
         client_opts = [config.api_token, config.timeouts]
         client_method = config.use_oauth2_token ? :oauth2_client : :client
 
@@ -51,41 +54,36 @@ module LokaliseManager
 
       private
 
-      # Checks task options
-      #
-      # @return Array
+      # Checks and validates task options, raising errors if configurations are missing.
       def check_options_errors!
         errors = []
         errors << 'Project ID is not set!' if config.project_id.nil? || config.project_id.empty?
         errors << 'Lokalise API token is not set!' if config.api_token.nil? || config.api_token.empty?
-
-        raise(LokaliseManager::Error, errors.join(' ')) if errors.any?
+        raise LokaliseManager::Error, errors.join(' ') if errors.any?
       end
 
-      # Checks whether the provided file has a proper extension as dictated by the `file_ext_regexp` option
+      # Determines if the file has the correct extension based on the configuration.
       #
-      # @return Boolean
-      # @param raw_path [String, Pathname]
+      # @param raw_path [String, Pathname] Path to check.
+      # @return [Boolean] True if the extension matches, false otherwise.
       def proper_ext?(raw_path)
         path = raw_path.is_a?(Pathname) ? raw_path : Pathname.new(raw_path)
         config.file_ext_regexp.match? path.extname
       end
 
-      # Returns directory and filename for the given entry
+      # Extracts the directory and filename from a given path.
       #
-      # @return Array
-      # @param entry [String]
+      # @param entry [String] The file path.
+      # @return [Array] Contains [Pathname, Pathname] representing the directory and filename.
       def subdir_and_filename_for(entry)
         Pathname.new(entry).split
       end
 
-      # Returns Lokalise project ID and branch, semicolumn separated
+      # Constructs a project identifier string that may include a branch.
       #
-      # @return [String]
+      # @return [String] Project identifier potentially including the branch.
       def project_id_with_branch
-        return config.project_id.to_s if config.branch.to_s.strip.empty?
-
-        "#{config.project_id}:#{config.branch}"
+        config.branch.to_s.strip.empty? ? config.project_id.to_s : "#{config.project_id}:#{config.branch}"
       end
 
       # In rare cases the server might return HTML instead of JSON.
@@ -93,7 +91,7 @@ module LokaliseManager
       # Until this is fixed, we revert to this quick'n'dirty solution.
       EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests].freeze
 
-      # Sends request with exponential backoff mechanism
+      # Implements an exponential backoff strategy for handling retries after failures.
       def with_exp_backoff(max_retries)
         return unless block_given?
 

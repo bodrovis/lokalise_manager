@@ -26,8 +26,8 @@ describe LokaliseManager::TaskDefinitions::Importer do
       entry = double
       allow(entry).to receive(:name).and_return('fail.yml')
       allow(described_object).to receive(:data_from).with(entry).and_raise(EncodingError)
-      expect { described_object.send(:process!, entry) }
-        .to raise_error(EncodingError, /Error when trying to process fail\.yml/)
+      expect { described_object.send(:process_entry, entry) }
+        .to raise_error(EncodingError, /Error processing entry fail\.yml/)
 
       expect(described_object).to have_received(:data_from)
     end

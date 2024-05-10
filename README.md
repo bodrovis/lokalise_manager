@@ -6,17 +6,22 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/9b682367a274ee3dcdee/maintainability)](https://codeclimate.com/github/bodrovis/lokalise_manager/maintainability)
 ![Downloads total](https://img.shields.io/gem/dt/lokalise_manager)
 
-This gem provides [Lokalise](http://lokalise.com) integration for Ruby and allows to exchange translation files between your project and TMS easily. It relies on [ruby-lokalise-api](https://lokalise.github.io/ruby-lokalise-api) to send APIv2 requests.
+The LokaliseManager gem provides seamless integration with [Lokalise](http://lokalise.com), enabling easy exchange of translation files between your Ruby project and the Lokalise translation management system (TMS). It leverages the [ruby-lokalise-api](https://lokalise.github.io/ruby-lokalise-api) to send and manage APIv2 requests.
 
-If you are looking for a Rails integration, please check [lokalise_rails](https://github.com/bodrovis/lokalise_rails) which provides a set of Rake tasks for importing/exporting.
+For integration directly with Rails applications, refer to [lokalise_rails](https://github.com/bodrovis/lokalise_rails), which offers a suite of Rake tasks specifically designed for importing and exporting translation files.
 
-## Getting started
+## Getting Started
 
 ### Requirements
 
-This gem requires Ruby 3.0+. You will also need to [setup a Lokalise account](https://app.lokalise.com/signup) and create a [translation project](https://docs.lokalise.com/en/articles/1400460-projects). Finally, you will need to generate a [read/write API token](https://docs.lokalise.com/en/articles/1929556-api-tokens) at your Lokalise profile.
+- **Ruby version**: Ruby 3.0 or higher is required.
+- **Lokalise account**: You must have an active [Lokalise account](https://app.lokalise.com/signup).
+- **Project setup**: Create a [translation project](https://docs.lokalise.com/en/articles/1400460-projects) within your Lokalise account.
+- **API token**: Obtain a read/write [API token](https://docs.lokalise.com/en/articles/1929556-api-tokens) from your Lokalise profile.
 
-Alternatively, you can utilize a token obtained via OAuth 2 flow. When using such a token, you'll have to set `:use_oauth2_token` option to `true` (see below).
+### Optional
+
+- **OAuth 2 token**: If you prefer using an OAuth 2 token instead of a standard API token, set the `:use_oauth2_token` option to `true` in your configuration settings.
 
 ### Installation
 

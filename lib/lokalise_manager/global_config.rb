@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module LokaliseManager
-  # Global configuration options available for LokaliseManager
+  # GlobalConfig provides a central place to manage configuration settings for LokaliseManager.
+  # It allows setting various operational parameters such as API tokens, paths, and behavior modifiers.
   class GlobalConfig
     class << self
       attr_accessor :api_token, :project_id
@@ -11,58 +12,57 @@ module LokaliseManager
                   :max_retries_export, :max_retries_import, :use_oauth2_token, :silent_mode,
                   :raise_on_export_fail
 
-      # Main interface to provide configuration options
+      # Yield self to block for configuration
       def config
         yield self
       end
 
-      # When enabled, will re-raise any exception that happens during file exporting
+      # Return whether to raise on export failure
       def raise_on_export_fail
-        @raise_on_export_fail || true
+        @raise_on_export_fail.nil? ? true : @raise_on_export_fail
       end
 
-      # When enabled, won't print any debugging info to $stdout
+      # Return whether debugging information is suppressed
       def silent_mode
         @silent_mode || false
       end
 
-      # When enabled, will use OAuth 2 Lokalise client and will require to provide a token obtained via OAuth 2 flow
-      # rather than via Lokalise profile
+      # Return whether to use OAuth2 tokens instead of regular API tokens
       def use_oauth2_token
         @use_oauth2_token || false
       end
 
-      # Full path to directory with translation files
+      # Return the path to locales
       def locales_path
         @locales_path || "#{Dir.getwd}/locales"
       end
 
-      # Project branch to use
+      # Return the project branch
       def branch
         @branch || ''
       end
 
-      # Set request timeouts for the Lokalise API client
+      # Return API request timeouts
       def timeouts
         @timeouts || {}
       end
 
-      # Maximum number of retries for file exporting
+      # Return the max retries for export
       def max_retries_export
         @max_retries_export || 5
       end
 
-      # Maximum number of retries for file importing
+      # Return the max retries for import
       def max_retries_import
         @max_retries_import || 5
       end
 
-      # Regular expression used to select translation files with proper extensions
+      # Return the regex for file extensions
       def file_ext_regexp
         @file_ext_regexp || /\.ya?ml\z/i
       end
 
-      # Options for import rake task
+      # Return import options with defaults
       def import_opts
         @import_opts || {
           format: 'ruby_yaml',
@@ -74,33 +74,32 @@ module LokaliseManager
         }
       end
 
-      # Options for export rake task
+      # Return export options
       def export_opts
         @export_opts || {}
       end
 
-      # Enables safe mode for import. When enabled, will check whether the target folder is empty or not
+      # Return whether import should check if target is empty
       def import_safe_mode
         @import_safe_mode.nil? ? false : @import_safe_mode
       end
 
-      # Additional file skip criteria to apply when performing export
+      # Return whether to skip file export based on a lambda condition
       def skip_file_export
         @skip_file_export || ->(_) { false }
       end
 
+      # Load translations from raw data
       def translations_loader
-        @translations_loader || ->(raw_data) { YAML.safe_load raw_data }
+        @translations_loader || ->(raw_data) { YAML.safe_load(raw_data) }
       end
 
-      # Converts translations data to the proper format
+      # Convert raw translation data to YAML format
       def translations_converter
         @translations_converter || ->(raw_data) { YAML.dump(raw_data).gsub('\\\\n', '\n') }
       end
 
-      # Infers lang ISO for the given translation file
-      # The lambda expects to accept the raw contents of the translation file
-      # and the full path to the file (instance of the `Pathname` class)
+      # Infer language ISO code from translation file
       def lang_iso_inferer
         @lang_iso_inferer || ->(data, _path) { YAML.safe_load(data)&.keys&.first }
       end
