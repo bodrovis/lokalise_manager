@@ -15,13 +15,9 @@ module LokaliseManager
       def export!
         check_options_errors!
 
-        queued_processes = []
-
-        all_files.each_slice(MAX_THREADS) do |files_group|
-          parallel_upload(files_group).each do |thr|
-            raise_on_fail(thr) if config.raise_on_export_fail
-
-            queued_processes.push thr
+        queued_processes = all_files.each_slice(MAX_THREADS).flat_map do |files_group|
+          parallel_upload(files_group).tap do |threads|
+            threads.each { |thr| raise_on_fail(thr) if config.raise_on_export_fail }
           end
         end
 
@@ -36,17 +32,19 @@ module LokaliseManager
       #
       # @param files_group [Array] Group of files to be uploaded.
       # @return [Array] Array of threads handling the file uploads.
-
       def parallel_upload(files_group)
         files_group.map do |file_data|
           Thread.new { do_upload(*file_data) }
         end.map(&:value)
       end
 
+      # Raises an error if a file upload thread failed.
+      #
+      # @param thread [Struct] The result of the file upload thread.
       def raise_on_fail(thread)
         return if thread.success
 
-        raise(thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}")
+        raise thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}"
       end
 
       # Performs the actual upload of a file to Lokalise.
@@ -56,56 +54,55 @@ module LokaliseManager
       # @return [Struct] A struct with the success status, process details, and any error information.
       def do_upload(f_path, r_path)
         proc_klass = Struct.new(:success, :process, :path, :error, keyword_init: true)
-        begin
-          process = with_exp_backoff(config.max_retries_export) do
-            api_client.upload_file(project_id_with_branch, opts(f_path, r_path))
-          end
-          proc_klass.new(success: true, process: process, path: f_path)
-        rescue StandardError => e
-          proc_klass.new(success: false, path: f_path, error: e)
+
+        process = with_exp_backoff(config.max_retries_export) do
+          api_client.upload_file(project_id_with_branch, opts(f_path, r_path))
         end
+
+        proc_klass.new(success: true, process: process, path: f_path)
+      rescue StandardError => e
+        proc_klass.new(success: false, path: f_path, error: e)
       end
 
       # Prints a completion message to standard output.
       def print_completion_message
-        $stdout.print('Task complete!')
+        $stdout.puts 'Task complete!'
       end
 
-      # Gets translation files from the specified directory
+      # Retrieves all translation files from the specified directory.
+      #
+      # @return [Array] Array of [Pathname, Pathname] pairs representing full and relative paths.
       def all_files
-        loc_path = config.locales_path
-        Dir["#{loc_path}/**/*"].filter_map do |f|
-          full_path = Pathname.new f
+        loc_path = Pathname.new(config.locales_path)
 
-          next unless file_matches_criteria? full_path
+        Dir["#{loc_path}/**/*"].filter_map do |file|
+          full_path = Pathname.new(file)
+          next unless file_matches_criteria?(full_path)
 
-          relative_path = full_path.relative_path_from Pathname.new(loc_path)
-
+          relative_path = full_path.relative_path_from(loc_path)
           [full_path, relative_path]
         end
       end
 
-      # Generates export options
+      # Generates options for file upload to Lokalise.
       #
-      # @return [Hash]
-      # @param full_p [Pathname]
-      # @param relative_p [Pathname]
+      # @param full_p [Pathname] Full path to the file.
+      # @param relative_p [Pathname] Relative path within the project.
+      # @return [Hash] Options for the Lokalise API upload.
       def opts(full_p, relative_p)
-        content = File.read full_p
+        content = File.read(full_p).strip
 
-        initial_opts = {
-          data: Base64.strict_encode64(content.strip),
-          filename: relative_p,
+        {
+          data: Base64.strict_encode64(content),
+          filename: relative_p.to_s,
           lang_iso: config.lang_iso_inferer.call(content, full_p)
-        }
-
-        initial_opts.merge config.export_opts
+        }.merge(config.export_opts)
       end
 
-      # Checks whether the specified file has to be processed or not
+      # Checks whether the specified file meets the criteria for upload.
       #
-      # @return [Boolean]
-      # @param full_path [Pathname]
+      # @param full_path [Pathname] Full path to the file.
+      # @return [Boolean] True if the file matches criteria, false otherwise.
       def file_matches_criteria?(full_path)
         full_path.file? && proper_ext?(full_path) &&
           !config.skip_file_export.call(full_path)

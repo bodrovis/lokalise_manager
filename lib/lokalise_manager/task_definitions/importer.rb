@@ -6,9 +6,8 @@ require 'fileutils'
 
 module LokaliseManager
   module TaskDefinitions
-    # The Importer class is responsible for downloading translation files from Lokalise
-    # and importing them into the specified project directory. This class extends the Base class,
-    # which provides shared functionality and configuration management.
+    # The Importer class handles downloading translation files from Lokalise
+    # and importing them into the specified project directory.
     class Importer < Base
       # Initiates the import process by checking configuration, ensuring safe mode conditions,
       # downloading files, and processing them. Outputs task completion status.
@@ -46,11 +45,7 @@ module LokaliseManager
       # @param path [String] The URL or local path to the ZIP archive.
       def open_and_process_zip(path)
         Zip::File.open_buffer(open_file_or_remote(path)) do |zip|
-          zip.each do |entry|
-            next unless proper_ext?(entry.name)
-
-            process_entry(entry)
-          end
+          zip.each { |entry| process_entry(entry) if proper_ext?(entry.name) }
         end
       rescue StandardError => e
         raise e.class, "Error processing ZIP file: #{e.message}"
@@ -80,8 +75,7 @@ module LokaliseManager
 
         $stdout.puts "The target directory #{config.locales_path} is not empty!"
         $stdout.print 'Enter Y to continue: '
-        answer = $stdin.gets
-        answer.to_s.strip == 'Y'
+        $stdin.gets.strip.upcase == 'Y'
       end
 
       # Opens a local file or a remote URL using the provided path, safely handling different path schemes.
@@ -89,13 +83,8 @@ module LokaliseManager
       # @param path [String] The path to the file, either a local path or a URL.
       # @return [IO] Returns an IO object for the file.
       def open_file_or_remote(path)
-        parsed_path = URI.parse(path)
-
-        if parsed_path&.scheme&.include?('http')
-          parsed_path.open
-        else
-          File.open path
-        end
+        uri = URI.parse(path)
+        uri.scheme&.start_with?('http') ? uri.open : File.open(path)
       end
 
       # Loads translations from the ZIP file.

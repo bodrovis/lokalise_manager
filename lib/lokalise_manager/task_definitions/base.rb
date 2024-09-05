@@ -5,9 +5,8 @@ require 'pathname'
 
 module LokaliseManager
   module TaskDefinitions
-    # Base class for LokaliseManager task definitions, including common methods and logic.
-    # This class serves as the foundation for importer and exporter classes, handling API
-    # client interactions and configuration merging.
+    # Base class for LokaliseManager task definitions, providing common methods and logic
+    # for importer and exporter classes. Handles API client interactions and configuration merging.
     class Base
       using LokaliseManager::Utils::HashUtils
 
@@ -18,31 +17,15 @@ module LokaliseManager
       # @param custom_opts [Hash] Custom configurations for specific tasks.
       # @param global_config [Object] Reference to the global configuration.
       def initialize(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
-        primary_opts = global_config
-                       .singleton_methods
-                       .filter { |m| m.to_s.end_with?('=') }
-                       .each_with_object({}) do |method, opts|
-          reader = method.to_s.delete_suffix('=')
-          opts[reader.to_sym] = global_config.send(reader)
-        end
-
-        all_opts = primary_opts.deep_merge(custom_opts)
-
-        config_klass = Struct.new(*all_opts.keys, keyword_init: true)
-
-        @config = config_klass.new all_opts
+        merged_opts = merge_configs(global_config, custom_opts)
+        @config = build_config_class(merged_opts)
       end
 
-      # Creates or retrieves a Lokalise API client based on configuration.
+      # Retrieves or creates a Lokalise API client based on configuration.
       #
       # @return [RubyLokaliseApi::Client] Lokalise API client.
       def api_client
-        return @api_client if @api_client
-
-        client_opts = [config.api_token, config.timeouts]
-        client_method = config.use_oauth2_token ? :oauth2_client : :client
-
-        @api_client = ::RubyLokaliseApi.send(client_method, *client_opts)
+        @api_client ||= create_api_client
       end
 
       # Resets API client
@@ -54,15 +37,42 @@ module LokaliseManager
 
       private
 
+      # Creates a Lokalise API client based on configuration.
+      def create_api_client
+        client_opts = [config.api_token, config.timeouts]
+        client_method = config.use_oauth2_token ? :oauth2_client : :client
+
+        ::RubyLokaliseApi.public_send(client_method, *client_opts)
+      end
+
+      # Merges global and custom configurations.
+      def merge_configs(global_config, custom_opts)
+        primary_opts = global_config
+                       .singleton_methods
+                       .select { |m| m.to_s.end_with?('=') }
+                       .each_with_object({}) do |method, opts|
+          reader = method.to_s.delete_suffix('=')
+          opts[reader.to_sym] = global_config.public_send(reader)
+        end
+
+        primary_opts.deep_merge(custom_opts)
+      end
+
+      # Builds a config class with the given options.
+      def build_config_class(all_opts)
+        config_klass = Struct.new(*all_opts.keys, keyword_init: true)
+        config_klass.new(all_opts)
+      end
+
       # Checks and validates task options, raising errors if configurations are missing.
       def check_options_errors!
         errors = []
         errors << 'Project ID is not set!' if config.project_id.nil? || config.project_id.empty?
         errors << 'Lokalise API token is not set!' if config.api_token.nil? || config.api_token.empty?
-        raise LokaliseManager::Error, errors.join(' ') if errors.any?
+        raise LokaliseManager::Error, errors.join(' ') unless errors.empty?
       end
 
-      # Determines if the file has the correct extension based on the configuration.
+      # Checks if the file has the correct extension based on the configuration.
       #
       # @param raw_path [String, Pathname] Path to check.
       # @return [Boolean] True if the extension matches, false otherwise.
@@ -91,7 +101,7 @@ module LokaliseManager
       # Until this is fixed, we revert to this quick'n'dirty solution.
       EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests].freeze
 
-      # Implements an exponential backoff strategy for handling retries after failures.
+      # Handles retries with exponential backoff for specific exceptions.
       def with_exp_backoff(max_retries)
         return unless block_given?
 
