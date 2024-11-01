@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.1.2 (01-Nov-2024)
+
+* Update dependencies
+
 ## 5.1.1 (10-May-2024)
 
 * Update documentation, minor code fixes
