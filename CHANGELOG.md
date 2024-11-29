@@ -1,6 +1,6 @@
 # Changelog
 
-## 6.0.0
+## 6.0.0 (29-Nov-2024)
 
 * **Breaking change**: rename the `timeouts` config method to `additional_client_opts`. It has the same usage but now enables you to set both client timeouts and override the API host to send requests to.
 
