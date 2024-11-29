@@ -63,13 +63,14 @@ describe LokaliseManager::GlobalConfig do
     expect(fake_class).to have_received(:branch=)
   end
 
-  it 'is possible to set timeouts' do
-    allow(fake_class).to receive(:timeouts=).with(duck_type(:each))
-    fake_class.timeouts = {
+  it 'is possible to set additional_client_opts' do
+    allow(fake_class).to receive(:additional_client_opts=).with(duck_type(:each))
+    fake_class.additional_client_opts = {
       open_timeout: 100,
-      timeout: 500
+      timeout: 500,
+      api_host: 'http://example.com'
     }
-    expect(fake_class).to have_received(:timeouts=)
+    expect(fake_class).to have_received(:additional_client_opts=)
   end
 
   it 'is possible to set import_safe_mode' do

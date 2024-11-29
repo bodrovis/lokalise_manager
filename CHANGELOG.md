@@ -1,5 +1,17 @@
 # Changelog
 
+## 6.0.0
+
+* **Breaking change**: rename the `timeouts` config method to `additional_client_opts`. It has the same usage but now enables you to set both client timeouts and override the API host to send requests to.
+
+```ruby
+additional_client_opts: {
+  open_timeout: 100,
+  timeout: 500,
+  api_host: 'http://example.com/api'
+}
+```
+
 ## 5.1.2 (01-Nov-2024)
 
 * Update dependencies

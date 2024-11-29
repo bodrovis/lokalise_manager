@@ -39,7 +39,7 @@ module LokaliseManager
 
       # Creates a Lokalise API client based on configuration.
       def create_api_client
-        client_opts = [config.api_token, config.timeouts]
+        client_opts = [config.api_token, config.additional_client_opts]
         client_method = config.use_oauth2_token ? :oauth2_client : :client
 
         ::RubyLokaliseApi.public_send(client_method, *client_opts)

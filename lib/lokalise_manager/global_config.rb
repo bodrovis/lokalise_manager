@@ -7,7 +7,7 @@ module LokaliseManager
     class << self
       attr_accessor :api_token, :project_id
       attr_writer :import_opts, :import_safe_mode, :export_opts, :locales_path,
-                  :file_ext_regexp, :skip_file_export, :branch, :timeouts,
+                  :file_ext_regexp, :skip_file_export, :branch, :additional_client_opts,
                   :translations_loader, :translations_converter, :lang_iso_inferer,
                   :max_retries_export, :max_retries_import, :use_oauth2_token, :silent_mode,
                   :raise_on_export_fail
@@ -42,9 +42,9 @@ module LokaliseManager
         @branch || ''
       end
 
-      # Return API request timeouts
-      def timeouts
-        @timeouts || {}
+      # Return additional API client options
+      def additional_client_opts
+        @additional_client_opts || {}
       end
 
       # Return the max retries for export

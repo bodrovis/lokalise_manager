@@ -93,16 +93,31 @@ describe LokaliseManager::TaskDefinitions::Base do
 
   describe '.api_client' do
     it 'is possible to set timeouts' do
-      allow(described_object.config).to receive(:timeouts).and_return({
-                                                                        open_timeout: 100,
-                                                                        timeout: 500
-                                                                      })
+      allow(described_object.config).to receive(:additional_client_opts).and_return({
+                                                                                      open_timeout: 100,
+                                                                                      timeout: 500
+                                                                                    })
 
       client = described_object.api_client
       expect(client).to be_an_instance_of(RubyLokaliseApi::Client)
       expect(client).not_to be_an_instance_of(RubyLokaliseApi::OAuth2Client)
       expect(client.open_timeout).to eq(100)
       expect(client.timeout).to eq(500)
+      expect(client.api_host).to be_nil
+    end
+
+    it 'is possible to set API host' do
+      api_host = 'http://example.com/api'
+      allow(described_object.config).to receive(:additional_client_opts).and_return({
+                                                                                      api_host: api_host
+                                                                                    })
+
+      client = described_object.api_client
+      expect(client).to be_an_instance_of(RubyLokaliseApi::Client)
+      expect(client).not_to be_an_instance_of(RubyLokaliseApi::OAuth2Client)
+      expect(client.open_timeout).to be_nil
+      expect(client.timeout).to be_nil
+      expect(client.api_host).to eq(api_host)
     end
 
     it 'uses .oauth_client when the use_oauth2_token is true' do
