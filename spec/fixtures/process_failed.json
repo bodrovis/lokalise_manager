@@ -1,0 +1,12 @@
+{
+  "process": {
+    "process_id": "1efeebc7-00f8-6e28-b770-02a5473131f4",
+    "type": "async-export",
+    "status": "failed",
+    "message": "",
+    "created_by": 20181,
+    "created_by_email": "bodrovis@protonmail.com",
+    "created_at": "2023-05-16 12:00:49 (Etc/UTC)",
+    "created_at_timestamp": 1684238449
+  }
+}

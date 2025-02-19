@@ -4,14 +4,19 @@ require 'base64'
 
 module LokaliseManager
   module TaskDefinitions
-    # Class to handle exporting translation files from a local project to Lokalise.
+    # Handles exporting translation files from a local project to Lokalise.
     class Exporter < Base
       # Maximum number of concurrent uploads to avoid exceeding Lokalise API rate limits.
       MAX_THREADS = 6
 
-      # Exports translation files to Lokalise and handles any necessary concurrency and error checking.
+      # Exports translation files to Lokalise in batches to optimize performance.
       #
-      # @return [Array] An array of process statuses for each file uploaded.
+      # - Validates configuration.
+      # - Gathers translation files from the project directory.
+      # - Uploads files to Lokalise in parallel, respecting API rate limits.
+      # - Handles errors and ensures failed uploads are reported.
+      #
+      # @return [Array] An array of process results for each uploaded file.
       def export!
         check_options_errors!
 
@@ -28,10 +33,10 @@ module LokaliseManager
 
       private
 
-      # Handles parallel uploads of a group of files, utilizing threading.
+      # Uploads a group of files in parallel using threads.
       #
-      # @param files_group [Array] Group of files to be uploaded.
-      # @return [Array] Array of threads handling the file uploads.
+      # @param files_group [Array] List of file path pairs (full and relative).
+      # @return [Array] Array of results from the upload process.
       def parallel_upload(files_group)
         files_group.map do |file_data|
           Thread.new { do_upload(*file_data) }
@@ -47,11 +52,13 @@ module LokaliseManager
         raise thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}"
       end
 
-      # Performs the actual upload of a file to Lokalise.
+      # Uploads a single file to Lokalise.
       #
-      # @param f_path [Pathname] Full path to the file.
-      # @param r_path [Pathname] Relative path of the file within the project.
-      # @return [Struct] A struct with the success status, process details, and any error information.
+      # Uses exponential backoff to retry failed uploads.
+      #
+      # @param f_path [Pathname] Full file path.
+      # @param r_path [Pathname] Relative file path within the project.
+      # @return [Struct] Struct containing upload status, process details, and error (if any).
       def do_upload(f_path, r_path)
         proc_klass = Struct.new(:success, :process, :path, :error, keyword_init: true)
 
@@ -64,14 +71,14 @@ module LokaliseManager
         proc_klass.new(success: false, path: f_path, error: e)
       end
 
-      # Prints a completion message to standard output.
+      # Prints a message indicating that the export process is complete.
       def print_completion_message
         $stdout.puts 'Task complete!'
       end
 
-      # Retrieves all translation files from the specified directory.
+      # Collects all translation files that match export criteria.
       #
-      # @return [Array] Array of [Pathname, Pathname] pairs representing full and relative paths.
+      # @return [Array] List of [Pathname, Pathname] pairs (full and relative paths).
       def all_files
         loc_path = Pathname.new(config.locales_path)
 
@@ -84,11 +91,13 @@ module LokaliseManager
         end
       end
 
-      # Generates options for file upload to Lokalise.
+      # Constructs upload options for a file.
       #
-      # @param full_p [Pathname] Full path to the file.
+      # Reads and encodes the file content in Base64 before sending it to Lokalise.
+      #
+      # @param full_p [Pathname] Full file path.
       # @param relative_p [Pathname] Relative path within the project.
-      # @return [Hash] Options for the Lokalise API upload.
+      # @return [Hash] Upload options including encoded content, filename, and language.
       def opts(full_p, relative_p)
         content = File.read(full_p).strip
 
@@ -99,10 +108,14 @@ module LokaliseManager
         }.merge(config.export_opts)
       end
 
-      # Checks whether the specified file meets the criteria for upload.
+      # Determines if a file meets the criteria for export.
       #
-      # @param full_path [Pathname] Full path to the file.
-      # @return [Boolean] True if the file matches criteria, false otherwise.
+      # - Must be a valid file (not a directory).
+      # - Must match the allowed file extensions.
+      # - Must not be explicitly skipped by `skip_file_export`.
+      #
+      # @param full_path [Pathname] Full file path.
+      # @return [Boolean] `true` if the file should be uploaded, `false` otherwise.
       def file_matches_criteria?(full_path)
         full_path.file? && proper_ext?(full_path) &&
           !config.skip_file_export.call(full_path)

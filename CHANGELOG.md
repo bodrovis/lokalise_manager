@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.0 (19-Feb-2025)
+
+* Added support for `import_async` option (default to `false`). When enabled, the [import process will happen in the background](https://developers.lokalise.com/reference/download-files-async) and the gem will use exponential backoff to wait for its completion according to the `max_retries_import` option.
+
 ## 6.0.0 (29-Nov-2024)
 
 * **Breaking change**: rename the `timeouts` config method to `additional_client_opts`. It has the same usage but now enables you to set both client timeouts and override the API host to send requests to.

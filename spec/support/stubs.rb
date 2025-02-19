@@ -7,6 +7,14 @@ module Stubs
     set_stub(req, resp, params.merge({ default_status: 200, postfix: 'download' }))
   end
 
+  def stub_process_check(req, resp, process_id, params = {})
+    set_stub(req, resp, params.merge({ default_status: 200, postfix: process_id, endpoint: 'processes', method: :get }))
+  end
+
+  def stub_download_async(req, resp, params = {})
+    set_stub(req, resp, params.merge({ default_status: 200, postfix: 'async-download' }))
+  end
+
   def stub_upload(req, resp, params = {})
     set_stub(req, resp, params.merge({ default_status: 202, postfix: 'upload' }))
   end
@@ -15,10 +23,11 @@ module Stubs
 
   def set_stub(req, resp, params)
     project_id = params[:project_id] || ENV.fetch('LOKALISE_PROJECT_ID', nil)
+    endpoint = params.fetch(:endpoint, 'files')
 
     stub_request(
-      :post,
-      "https://api.lokalise.com/api2/projects/#{project_id}/files/#{params[:postfix]}"
+      params.fetch(:method, :post),
+      "https://api.lokalise.com/api2/projects/#{project_id}/#{endpoint}/#{params[:postfix]}"
     ).with(
       request_params(req)
     ).to_return(
@@ -27,15 +36,18 @@ module Stubs
   end
 
   def request_params(req)
-    {
+    req_params = {
       headers: {
         'Accept' => 'application/json',
         'Accept-Encoding' => 'gzip,deflate,br',
         'User-Agent' => "ruby-lokalise-api gem/#{RubyLokaliseApi::VERSION}",
         'X-Api-Token' => ENV.fetch('LOKALISE_API_TOKEN', nil)
-      },
-      body: JSON.dump(req)
+      }
     }
+
+    req_params = req_params.merge({ body: JSON.dump(req) }) if req
+
+    req_params
   end
 
   def response_params(resp, status)

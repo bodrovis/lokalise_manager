@@ -5,30 +5,43 @@ require 'pathname'
 
 module LokaliseManager
   module TaskDefinitions
-    # Base class for LokaliseManager task definitions, providing common methods and logic
-    # for importer and exporter classes. Handles API client interactions and configuration merging.
+    # Base class for LokaliseManager task definitions.
+    #
+    # Provides shared functionality for Importer and Exporter classes, including:
+    # - API client management.
+    # - Configuration merging.
+    # - File validation helpers.
+    # - Exponential backoff for retrying failed API requests.
     class Base
       using LokaliseManager::Utils::HashUtils
 
       attr_accessor :config
 
-      # Initializes a new task object by merging custom and global configurations.
+      # Defines exceptions that should trigger a retry with exponential backoff.
       #
-      # @param custom_opts [Hash] Custom configurations for specific tasks.
-      # @param global_config [Object] Reference to the global configuration.
+      # - `JSON::ParserError`: Occurs when the API responds with non-JSON content (e.g., HTML due to rate limits).
+      # - `RubyLokaliseApi::Error::TooManyRequests`: Raised when too many requests are sent in a short period.
+      EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests].freeze
+
+      # Initializes a new task object with merged global and custom configurations.
+      #
+      # @param custom_opts [Hash] Custom configuration options specific to the task.
+      # @param global_config [Object] The global configuration object.
       def initialize(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
         merged_opts = merge_configs(global_config, custom_opts)
         @config = build_config_class(merged_opts)
       end
 
-      # Retrieves or creates a Lokalise API client based on configuration.
+      # Retrieves or initializes the Lokalise API client based on the current configuration.
       #
-      # @return [RubyLokaliseApi::Client] Lokalise API client.
+      # @return [RubyLokaliseApi::Client] An instance of the Lokalise API client.
       def api_client
         @api_client ||= create_api_client
       end
 
-      # Resets API client
+      # Resets the API client, clearing cached instances.
+      #
+      # Useful when switching authentication tokens or handling connection issues.
       def reset_api_client!
         ::RubyLokaliseApi.reset_client!
         ::RubyLokaliseApi.reset_oauth2_client!
@@ -37,7 +50,9 @@ module LokaliseManager
 
       private
 
-      # Creates a Lokalise API client based on configuration.
+      # Creates a new Lokalise API client instance based on the configuration.
+      #
+      # @return [RubyLokaliseApi::Client] The initialized API client.
       def create_api_client
         client_opts = [config.api_token, config.additional_client_opts]
         client_method = config.use_oauth2_token ? :oauth2_client : :client
@@ -46,6 +61,13 @@ module LokaliseManager
       end
 
       # Merges global and custom configurations.
+      #
+      # - Extracts all global config values.
+      # - Merges them with custom options using a deep merge strategy.
+      #
+      # @param global_config [Object] The global configuration object.
+      # @param custom_opts [Hash] The custom configuration options.
+      # @return [Hash] The merged configuration.
       def merge_configs(global_config, custom_opts)
         primary_opts = global_config
                        .singleton_methods
@@ -58,13 +80,19 @@ module LokaliseManager
         primary_opts.deep_merge(custom_opts)
       end
 
-      # Builds a config class with the given options.
+      # Constructs a configuration object from a hash of options.
+      #
+      # Uses a struct to provide attribute-style access to settings.
+      #
+      # @param all_opts [Hash] The merged configuration options.
+      # @return [Struct] A configuration object.
       def build_config_class(all_opts)
-        config_klass = Struct.new(*all_opts.keys, keyword_init: true)
-        config_klass.new(all_opts)
+        Struct.new(*all_opts.keys, keyword_init: true).new(all_opts)
       end
 
-      # Checks and validates task options, raising errors if configurations are missing.
+      # Validates required configuration options.
+      #
+      # @raise [LokaliseManager::Error] If required configurations are missing.
       def check_options_errors!
         errors = []
         errors << 'Project ID is not set!' if config.project_id.nil? || config.project_id.empty?
@@ -72,36 +100,39 @@ module LokaliseManager
         raise LokaliseManager::Error, errors.join(' ') unless errors.empty?
       end
 
-      # Checks if the file has the correct extension based on the configuration.
+      # Checks if a file has a valid extension based on the configuration.
       #
-      # @param raw_path [String, Pathname] Path to check.
-      # @return [Boolean] True if the extension matches, false otherwise.
+      # @param raw_path [String, Pathname] The file path to check.
+      # @return [Boolean] `true` if the file has a valid extension, `false` otherwise.
       def proper_ext?(raw_path)
         path = raw_path.is_a?(Pathname) ? raw_path : Pathname.new(raw_path)
         config.file_ext_regexp.match? path.extname
       end
 
-      # Extracts the directory and filename from a given path.
+      # Extracts the subdirectory and filename from a given path.
       #
       # @param entry [String] The file path.
-      # @return [Array] Contains [Pathname, Pathname] representing the directory and filename.
+      # @return [Array<Pathname, Pathname>] An array containing the subdirectory and filename.
       def subdir_and_filename_for(entry)
         Pathname.new(entry).split
       end
 
-      # Constructs a project identifier string that may include a branch.
+      # Constructs a Lokalise project identifier that may include a branch.
       #
-      # @return [String] Project identifier potentially including the branch.
+      # If a branch is specified, the project ID is formatted as `project_id:branch`.
+      #
+      # @return [String] The formatted project identifier.
       def project_id_with_branch
         config.branch.to_s.strip.empty? ? config.project_id.to_s : "#{config.project_id}:#{config.branch}"
       end
 
-      # In rare cases the server might return HTML instead of JSON.
-      # It happens when too many requests are being sent.
-      # Until this is fixed, we revert to this quick'n'dirty solution.
-      EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests].freeze
-
-      # Handles retries with exponential backoff for specific exceptions.
+      # Executes a block with exponential backoff for handling API rate limits and temporary failures.
+      #
+      # Retries the operation for a defined number of attempts, doubling the wait time after each failure.
+      #
+      # @param max_retries [Integer] Maximum number of retries before giving up.
+      # @yield The operation to retry.
+      # @return [Object] The result of the block if successful.
       def with_exp_backoff(max_retries)
         return unless block_given?
 

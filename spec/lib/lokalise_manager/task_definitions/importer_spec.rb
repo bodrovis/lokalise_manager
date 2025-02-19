@@ -9,6 +9,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
   let(:loc_path) { described_object.config.locales_path }
   let(:project_id) { ENV.fetch('LOKALISE_PROJECT_ID', nil) }
   let(:local_trans) { "#{Dir.getwd}/spec/fixtures/response_files/trans.zip" }
+  let(:process_id) { '1efeebc7-00f8-6e28-b770-02a5473131f4' }
   let(:local_trans_slashes) { "#{Dir.getwd}/spec/fixtures/response_files/trans_slashes.zip" }
   let(:common_params) do
     {
@@ -42,6 +43,56 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
       expect { described_object.send(:open_and_process_zip, fake_path) }
         .to raise_error(SocketError, /Failed to open TCP connection/)
+    end
+  end
+
+  describe '#download_files_async' do
+    it 'returns a proper process' do
+      stub_download_async(common_params, 'download_files_async.json')
+      stub_process_check(nil, 'process_finished.json', process_id)
+
+      allow(described_object).to receive_messages(sleep: 0)
+
+      process = described_object.send :download_files_async
+
+      expect(process.details['download_url']).to eq('https://example.com/download/bundle')
+      expect(process.status).to eq('finished')
+    end
+
+    it 're-raises errors during file download' do
+      allow_project_id described_object, 'invalid'
+
+      stub_download_async(common_params, 'invalid_project_id.json', status: 400, project_id: 'invalid')
+
+      expect { described_object.send :download_files_async }
+        .to raise_error(RubyLokaliseApi::Error::BadRequest, /Invalid `project_id` parameter/)
+    end
+  end
+
+  describe '#wait_for_async_download' do
+    it 'raises an error when process failed' do
+      allow(described_object).to receive_messages(sleep: 0)
+
+      stub_process_check(nil, 'process_failed.json', process_id)
+
+      expect { described_object.send(:wait_for_async_download, process_id) }
+        .to raise_error(LokaliseManager::Error, 'Asynchronous download process failed')
+
+      expect(described_object).to have_received(:sleep).exactly(1).times
+    end
+
+    it 'raises an error when retries have been exhausted' do
+      max_retries = described_object.config.max_retries_import
+
+      allow(described_object).to receive_messages(sleep: 0)
+
+      stub_process_check(nil, 'process_queued.json', process_id)
+
+      expect { described_object.send(:wait_for_async_download, process_id) }
+        .to raise_error(LokaliseManager::Error,
+                        "Asynchronous download process timed out after #{max_retries} tries")
+
+      expect(described_object).to have_received(:sleep).exactly(max_retries + 1).times
     end
   end
 
@@ -135,6 +186,30 @@ describe LokaliseManager::TaskDefinitions::Importer do
         result = nil
 
         stub_download(common_params, 'import.json')
+
+        expect { result = described_object.import! }.to output(/complete!/).to_stdout
+
+        expect(result).to be true
+
+        expect(count_translations).to eq(4)
+      end
+
+      it 'runs async import successfully' do
+        process = RubyLokaliseApi::Resources::QueuedProcess.new(RubyLokaliseApi::Response.new({}, nil))
+        process.instance_variable_set(:@process_id, process_id)
+        process.instance_variable_set(:@status, 'finished')
+        process.instance_variable_set(:@details, { download_url: local_trans })
+
+        allow(described_object).to receive(:download_files_async).and_return(
+          process
+        )
+
+        allow(described_object.config).to receive(:import_async).and_return(true)
+
+        result = nil
+
+        stub_download_async(common_params, 'download_files_async.json')
+        stub_process_check(nil, 'process_finished.json', process_id)
 
         expect { result = described_object.import! }.to output(/complete!/).to_stdout
 

@@ -79,6 +79,12 @@ describe LokaliseManager::GlobalConfig do
     expect(fake_class).to have_received(:import_safe_mode=)
   end
 
+  it 'is possible to set import_async' do
+    allow(fake_class).to receive(:import_async=).with(true)
+    fake_class.import_async = true
+    expect(fake_class).to have_received(:import_async=)
+  end
+
   it 'is possible to set max_retries_export' do
     allow(fake_class).to receive(:max_retries_export=).with(10)
     fake_class.max_retries_export = 10

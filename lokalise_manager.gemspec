@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.extra_rdoc_files = ['README.md']
   spec.require_paths    = ['lib']
 
+  spec.add_dependency 'base64', '~> 0.2.0'
   spec.add_dependency 'ruby-lokalise-api', '~> 9.3'
   spec.add_dependency 'rubyzip', '~> 2.3'
   spec.add_dependency 'zeitwerk', '~> 2.4'

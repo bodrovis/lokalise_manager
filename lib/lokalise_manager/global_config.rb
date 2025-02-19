@@ -10,7 +10,7 @@ module LokaliseManager
                   :file_ext_regexp, :skip_file_export, :branch, :additional_client_opts,
                   :translations_loader, :translations_converter, :lang_iso_inferer,
                   :max_retries_export, :max_retries_import, :use_oauth2_token, :silent_mode,
-                  :raise_on_export_fail
+                  :raise_on_export_fail, :import_async
 
       # Yield self to block for configuration
       def config
@@ -82,6 +82,11 @@ module LokaliseManager
       # Return whether import should check if target is empty
       def import_safe_mode
         @import_safe_mode.nil? ? false : @import_safe_mode
+      end
+
+      # Return whether import should be performed asynchronously
+      def import_async
+        @import_async.nil? ? false : @import_async
       end
 
       # Return whether to skip file export based on a lambda condition

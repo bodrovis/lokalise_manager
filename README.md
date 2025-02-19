@@ -146,6 +146,7 @@ importer = LokaliseManager.importer api_token: '1234abc',
 
 * `import_safe_mode` (`boolean`) — default to `false`. When this option is enabled, the import task will check whether the directory set with `locales_path` is empty or not. If it is not empty, you will be prompted to continue.
 * `max_retries_import` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, this gem will apply an exponential backoff mechanism with a very simple formula: `2 ** retries`. If the maximum number of retries has been reached, a `RubyLokaliseApi::Error::TooManyRequests` exception will be raised and the operation will be halted.
+* `import_async` (`boolean`) — default to `false`. Runs the [import in the background](https://developers.lokalise.com/reference/download-files-async) on Lokalise. Uses exponential backoff to wait for completion, based on `max_retries_import`. Useful only for large projects.
 
 ### Export config
 
