@@ -99,8 +99,6 @@ module LokaliseManager
         Zip::File.open_buffer(open_file_or_remote(path)) do |zip|
           zip.each { |entry| process_entry(entry) if proper_ext?(entry.name) }
         end
-      rescue StandardError => e
-        raise e.class, "Error processing ZIP file: #{e.message}"
       end
 
       # Extracts data from a ZIP entry and writes it to the correct directory.
@@ -116,8 +114,6 @@ module LokaliseManager
         FileUtils.mkdir_p File.dirname(full_path)
 
         File.write(full_path, config.translations_converter.call(data), mode: 'w+:UTF-8')
-      rescue StandardError => e
-        raise e.class, "Error processing entry #{zip_entry.name}: #{e.message}"
       end
 
       # Checks whether the import should proceed under safe mode constraints.
@@ -157,8 +153,6 @@ module LokaliseManager
       # @return [Object] The result of the successful operation.
       def fetch_with_retry(&block)
         with_exp_backoff(config.max_retries_import, &block)
-      rescue StandardError => e
-        raise e.class, "Error during file download: #{e.message}"
       end
     end
   end

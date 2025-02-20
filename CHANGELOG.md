@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.1.1 (20-Feb-2025)
+
+* Prevent error swallowing in rare cases
+
 ## 6.1.0 (19-Feb-2025)
 
 * Added support for `import_async` option (default to `false`). When enabled, the [import process will happen in the background](https://developers.lokalise.com/reference/download-files-async) and the gem will use exponential backoff to wait for its completion according to the `max_retries_import` option.

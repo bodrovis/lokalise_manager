@@ -9,6 +9,8 @@ module LokaliseManager
       # Maximum number of concurrent uploads to avoid exceeding Lokalise API rate limits.
       MAX_THREADS = 6
 
+      ProcessResult = Struct.new(:success, :process, :path, :error, keyword_init: true)
+
       # Exports translation files to Lokalise in batches to optimize performance.
       #
       # - Validates configuration.
@@ -49,7 +51,7 @@ module LokaliseManager
       def raise_on_fail(thread)
         return if thread.success
 
-        raise thread.error.class, "Error while trying to upload #{thread.path}: #{thread.error.message}"
+        raise thread.error
       end
 
       # Uploads a single file to Lokalise.
@@ -60,15 +62,13 @@ module LokaliseManager
       # @param r_path [Pathname] Relative file path within the project.
       # @return [Struct] Struct containing upload status, process details, and error (if any).
       def do_upload(f_path, r_path)
-        proc_klass = Struct.new(:success, :process, :path, :error, keyword_init: true)
-
         process = with_exp_backoff(config.max_retries_export) do
           api_client.upload_file(project_id_with_branch, opts(f_path, r_path))
         end
 
-        proc_klass.new(success: true, process: process, path: f_path)
+        ProcessResult.new(success: true, process: process, path: f_path)
       rescue StandardError => e
-        proc_klass.new(success: false, path: f_path, error: e)
+        ProcessResult.new(success: false, path: f_path, error: e)
       end
 
       # Prints a message indicating that the export process is complete.
