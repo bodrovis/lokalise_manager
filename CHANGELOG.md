@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.0 (25-Feb-2025)
+
+* Strengthened configuration merging logic for `import_opts` and `export_opts` to retain default values when overridden.
+
 ## 6.1.1 (20-Feb-2025)
 
 * Prevent error swallowing in rare cases

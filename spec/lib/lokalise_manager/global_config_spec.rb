@@ -1,139 +1,173 @@
 # frozen_string_literal: true
 
 describe LokaliseManager::GlobalConfig do
-  let(:fake_class) { class_double(described_class) }
+  let(:fake_config) { Class.new(described_class) }
 
-  it 'is possible to provide config' do
-    described_class.config do |c|
-      expect(c).to eq(described_class)
+  describe 'configuration management' do
+    it 'yields itself during configuration block' do
+      fake_config.config do |c|
+        expect(c).to eq(fake_config)
+      end
     end
   end
 
-  it 'is possible to set project_id' do
-    allow(fake_class).to receive(:project_id=).with('123.abc')
-    fake_class.project_id = '123.abc'
-    expect(fake_class).to have_received(:project_id=)
+  describe 'global options' do
+    it 'allows setting project_id' do
+      fake_config.project_id = '123.abc'
+      expect(fake_config.project_id).to eq('123.abc')
+    end
+
+    it 'allows setting api_token' do
+      fake_config.api_token = 'abc'
+      expect(fake_config.api_token).to eq('abc')
+    end
+
+    it 'allows setting branch' do
+      fake_config.branch = 'custom'
+      expect(fake_config.branch).to eq('custom')
+    end
+
+    it 'allows setting locales_path' do
+      fake_config.locales_path = '/demo/path'
+      expect(fake_config.locales_path).to eq('/demo/path')
+    end
   end
 
-  it 'is possible to set raise_on_export_fail' do
-    allow(fake_class).to receive(:raise_on_export_fail=).with(false)
-    fake_class.raise_on_export_fail = false
-    expect(fake_class).to have_received(:raise_on_export_fail=)
+  describe 'boolean flags' do
+    it 'allows setting raise_on_export_fail' do
+      fake_config.raise_on_export_fail = false
+      expect(fake_config.raise_on_export_fail).to be(false)
+    end
+
+    it 'allows setting silent_mode' do
+      fake_config.silent_mode = true
+      expect(fake_config.silent_mode).to be(true)
+    end
+
+    it 'allows setting use_oauth2_token' do
+      fake_config.use_oauth2_token = true
+      expect(fake_config.use_oauth2_token).to be(true)
+    end
+
+    it 'allows setting import_safe_mode' do
+      fake_config.import_safe_mode = true
+      expect(fake_config.import_safe_mode).to be(true)
+    end
+
+    it 'allows setting import_async' do
+      fake_config.import_async = true
+      expect(fake_config.import_async).to be(true)
+    end
   end
 
-  it 'is possible to set silent_mode' do
-    allow(fake_class).to receive(:silent_mode=).with(true)
-    fake_class.silent_mode = true
-    expect(fake_class).to have_received(:silent_mode=)
+  describe 'retry settings' do
+    it 'allows setting max_retries_export' do
+      fake_config.max_retries_export = 10
+      expect(fake_config.max_retries_export).to eq(10)
+    end
+
+    it 'allows setting max_retries_import' do
+      fake_config.max_retries_import = 10
+      expect(fake_config.max_retries_import).to eq(10)
+    end
   end
 
-  it 'is possible to set use_oauth2_token' do
-    allow(fake_class).to receive(:use_oauth2_token=).with(true)
-    fake_class.use_oauth2_token = true
-    expect(fake_class).to have_received(:use_oauth2_token=)
+  describe 'path and regex settings' do
+    it 'allows setting file_ext_regexp' do
+      fake_config.file_ext_regexp = /\.json\z/i
+      expect(fake_config.file_ext_regexp).to eq(/\.json\z/i)
+    end
   end
 
-  it 'is possible to set file_ext_regexp' do
-    allow(fake_class).to receive(:file_ext_regexp=).with(Regexp.new('.*'))
-    fake_class.file_ext_regexp = Regexp.new('.*')
-    expect(fake_class).to have_received(:file_ext_regexp=)
+  describe 'API client settings' do
+    it 'allows setting additional_client_opts' do
+      fake_config.additional_client_opts = {
+        open_timeout: 100,
+        timeout: 500,
+        api_host: 'http://example.com'
+      }
+
+      expect(fake_config.additional_client_opts).to eq(
+        open_timeout: 100,
+        timeout: 500,
+        api_host: 'http://example.com'
+      )
+    end
   end
 
-  it 'is possible to set import_opts' do
-    allow(fake_class).to receive(:import_opts=).with(duck_type(:each))
-    fake_class.import_opts = {
-      format: 'json',
-      indentation: '8sp'
-    }
-    expect(fake_class).to have_received(:import_opts=)
+  describe '#import_opts' do
+    it 'returns default options when not set' do
+      expect(fake_config.import_opts).to eq(
+        format: 'ruby_yaml',
+        placeholder_format: :icu,
+        yaml_include_root: true,
+        original_filenames: true,
+        directory_prefix: '',
+        indentation: '2sp'
+      )
+    end
+
+    it 'merges user-defined import_opts with defaults' do
+      fake_config.import_opts = { indentation: '4sp', format: 'json', export_empty_as: :empty }
+
+      expect(fake_config.import_opts).to eq(
+        format: 'json',
+        placeholder_format: :icu,
+        yaml_include_root: true,
+        original_filenames: true,
+        directory_prefix: '',
+        indentation: '4sp',
+        export_empty_as: :empty
+      )
+    end
   end
 
-  it 'is possible to set export_opts' do
-    allow(fake_class).to receive(:export_opts=).with(duck_type(:each))
-    fake_class.export_opts = {
-      convert_placeholders: true,
-      detect_icu_plurals: true
-    }
-    expect(fake_class).to have_received(:export_opts=)
+  describe '#export_opts' do
+    it 'returns an empty hash by default' do
+      expect(fake_config.export_opts).to eq({})
+    end
+
+    it 'allows setting export_opts' do
+      fake_config.export_opts = { convert_placeholders: true, detect_icu_plurals: true }
+
+      expect(fake_config.export_opts).to eq(
+        convert_placeholders: true,
+        detect_icu_plurals: true
+      )
+    end
+
+    it 'ensures export_opts always returns a hash, even when set to nil' do
+      fake_config.export_opts = nil
+
+      expect(fake_config.export_opts).to eq({})
+    end
   end
 
-  it 'is possible to set branch' do
-    allow(fake_class).to receive(:branch=).with('custom')
-    fake_class.branch = 'custom'
-    expect(fake_class).to have_received(:branch=)
+  describe 'custom callable settings' do
+    it 'allows setting translations_loader' do
+      loader = lambda(&:to_json)
+      fake_config.translations_loader = loader
+      expect(fake_config.translations_loader).to eq(loader)
+    end
+
+    it 'allows setting translations_converter' do
+      converter = lambda(&:to_json)
+      fake_config.translations_converter = converter
+      expect(fake_config.translations_converter).to eq(converter)
+    end
+
+    it 'allows setting lang_iso_inferer' do
+      inferer = ->(file, _) { file.to_json }
+      fake_config.lang_iso_inferer = inferer
+      expect(fake_config.lang_iso_inferer).to eq(inferer)
+    end
   end
 
-  it 'is possible to set additional_client_opts' do
-    allow(fake_class).to receive(:additional_client_opts=).with(duck_type(:each))
-    fake_class.additional_client_opts = {
-      open_timeout: 100,
-      timeout: 500,
-      api_host: 'http://example.com'
-    }
-    expect(fake_class).to have_received(:additional_client_opts=)
-  end
-
-  it 'is possible to set import_safe_mode' do
-    allow(fake_class).to receive(:import_safe_mode=).with(true)
-    fake_class.import_safe_mode = true
-    expect(fake_class).to have_received(:import_safe_mode=)
-  end
-
-  it 'is possible to set import_async' do
-    allow(fake_class).to receive(:import_async=).with(true)
-    fake_class.import_async = true
-    expect(fake_class).to have_received(:import_async=)
-  end
-
-  it 'is possible to set max_retries_export' do
-    allow(fake_class).to receive(:max_retries_export=).with(10)
-    fake_class.max_retries_export = 10
-    expect(fake_class).to have_received(:max_retries_export=)
-  end
-
-  it 'is possible to set max_retries_import' do
-    allow(fake_class).to receive(:max_retries_import=).with(10)
-    fake_class.max_retries_import = 10
-    expect(fake_class).to have_received(:max_retries_import=)
-  end
-
-  it 'is possible to set api_token' do
-    allow(fake_class).to receive(:api_token=).with('abc')
-    fake_class.api_token = 'abc'
-    expect(fake_class).to have_received(:api_token=)
-  end
-
-  it 'is possible to override locales_path' do
-    allow(fake_class).to receive(:locales_path=).with('/demo/path')
-    fake_class.locales_path = '/demo/path'
-    expect(fake_class).to have_received(:locales_path=)
-  end
-
-  it 'is possible to set skip_file_export' do
-    cond = lambda(&:nil?)
-    allow(fake_class).to receive(:skip_file_export=).with(cond)
-    fake_class.skip_file_export = cond
-    expect(fake_class).to have_received(:skip_file_export=)
-  end
-
-  it 'is possible to set translations_loader' do
-    runner = lambda(&:to_json)
-    allow(fake_class).to receive(:translations_loader=).with(runner)
-    fake_class.translations_loader = runner
-    expect(fake_class).to have_received(:translations_loader=)
-  end
-
-  it 'is possible to set translations_converter' do
-    runner = lambda(&:to_json)
-    allow(fake_class).to receive(:translations_converter=).with(runner)
-    fake_class.translations_converter = runner
-    expect(fake_class).to have_received(:translations_converter=)
-  end
-
-  it 'is possible to set lang_iso_inferer' do
-    runner = ->(f, _) { f.to_json }
-    allow(fake_class).to receive(:lang_iso_inferer=).with(runner)
-    fake_class.lang_iso_inferer = runner
-    expect(fake_class).to have_received(:lang_iso_inferer=)
+  describe 'conditional settings' do
+    it 'allows setting skip_file_export' do
+      condition = lambda(&:nil?)
+      fake_config.skip_file_export = condition
+      expect(fake_config.skip_file_export).to eq(condition)
+    end
   end
 end

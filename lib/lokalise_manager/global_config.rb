@@ -64,7 +64,7 @@ module LokaliseManager
 
       # Return import options with defaults
       def import_opts
-        @import_opts || {
+        defaults = {
           format: 'ruby_yaml',
           placeholder_format: :icu,
           yaml_include_root: true,
@@ -72,6 +72,8 @@ module LokaliseManager
           directory_prefix: '',
           indentation: '2sp'
         }
+
+        defaults.merge(@import_opts || {})
       end
 
       # Return export options
