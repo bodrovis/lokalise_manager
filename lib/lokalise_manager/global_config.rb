@@ -19,7 +19,7 @@ module LokaliseManager
 
       # Return whether to raise on export failure
       def raise_on_export_fail
-        @raise_on_export_fail.nil? ? true : @raise_on_export_fail
+        @raise_on_export_fail.nil? || @raise_on_export_fail
       end
 
       # Return whether debugging information is suppressed
