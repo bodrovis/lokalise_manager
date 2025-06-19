@@ -45,7 +45,7 @@ module FileManager
   end
 
   private
-  
+
   def en_data
     <<~DATA
       en:

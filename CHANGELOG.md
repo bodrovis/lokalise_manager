@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.3.0 (19-Jun-2025)
+
+* Added a new export option `export_preprocessor` (`lambda` or `proc`) that enables you to specify additional processing logic for your translation files' content before uploading to Lokalise. This option defaults to `->(raw_data, _path) { raw_data }` (no processing).
+
+```ruby
+c.export_preprocessor = ->(raw_data, _path) { raw_data.upcase }
+```
+
 ## 6.2.0 (25-Feb-2025)
 
 * Strengthened configuration merging logic for `import_opts` and `export_opts` to retain default values when overridden.
