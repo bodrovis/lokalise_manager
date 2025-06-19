@@ -30,3 +30,6 @@ Metrics/AbcSize:
 
 Gemspec/DevelopmentDependencies:
   EnforcedStyle: gemspec
+
+Naming/PredicateMethod:
+  Enabled: false
