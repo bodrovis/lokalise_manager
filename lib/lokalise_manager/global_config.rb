@@ -10,7 +10,7 @@ module LokaliseManager
                   :file_ext_regexp, :skip_file_export, :branch, :additional_client_opts,
                   :translations_loader, :translations_converter, :lang_iso_inferer,
                   :max_retries_export, :max_retries_import, :use_oauth2_token, :silent_mode,
-                  :raise_on_export_fail, :import_async
+                  :raise_on_export_fail, :import_async, :export_preprocessor
 
       # Yield self to block for configuration
       def config
@@ -109,6 +109,11 @@ module LokaliseManager
       # Infer language ISO code from translation file
       def lang_iso_inferer
         @lang_iso_inferer || ->(data, _path) { YAML.safe_load(data)&.keys&.first }
+      end
+
+      # Preprocess content during exporting to Lokalise
+      def export_preprocessor
+        @export_preprocessor || ->(raw_data, _path) { raw_data }
       end
     end
   end

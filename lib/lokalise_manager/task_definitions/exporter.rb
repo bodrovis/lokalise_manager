@@ -102,7 +102,7 @@ module LokaliseManager
         content = File.read(full_p).strip
 
         {
-          data: Base64.strict_encode64(content),
+          data: Base64.strict_encode64(config.export_preprocessor.call(content, full_p)),
           filename: relative_p.to_s,
           lang_iso: config.lang_iso_inferer.call(content, full_p)
         }.merge(config.export_opts)

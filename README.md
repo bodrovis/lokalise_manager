@@ -172,10 +172,16 @@ In this case the `export_opts` will have `detect_icu_plurals` set to `true` and 
 
 **Please note** that if your Lokalise project does not have a language with the specified `lang_iso` code, the export will fail. It means that you first have to add all the locales to the project and then start the exporting process.
 
-* `skip_file_export` (`lambda` or `proc`) — specify additional exclusion criteria for the exported files. By default, the rake task will ignore all non-file entries and all files with improper extensions (the latter is controlled by the `file_ext_regexp`). Lambda passed to this option should accept a single argument which is full path to the file (instance of the [`Pathname` class](https://ruby-doc.org/stdlib-2.7.1/libdoc/pathname/rdoc/Pathname.html)). For example, to exclude all files that have `fr` part in their names, add the following config:
+* `skip_file_export` (`lambda` or `proc`) — specify additional exclusion criteria for the exported files. By default, the rake task will ignore all non-file entries and all files with improper extensions (the latter is controlled by the `file_ext_regexp`). Lambda passed to this option should accept a single argument which is full path to the file (instance of the [`Pathname` class](https://ruby-doc.org/3.4.1/exts/pathname/Pathname.html)). For example, to exclude all files that have `fr` part in their names, add the following config:
 
 ```ruby
 c.skip_file_export = ->(file) { f.split[1].to_s.include?('fr') }
+```
+
+* `export_preprocessor` (`lambda` or `proc`) — specify additional processing logic for your translation files' content before uploading to Lokalise. The lambda passed to this option accepts two arguments: raw translation file data and the full path to the file (instance of the `Pathname` class). It must return the translation content as a string, which will then be base64-encoded and sent to Lokalise (in other words, do not encode it with base64 yourself!). Note that if you have multiple translation files, this lambda will be called separately for each file. This option defaults to `->(raw_data, _path) { raw_data }` (no processing). For more complex setups, you can use [Lokalise custom processors](https://docs.lokalise.com/en/articles/6244434-custom-processor).
+
+```ruby
+c.export_preprocessor = ->(raw_data, _path) { raw_data.upcase }
 ```
 
 * `max_retries_export` (`integer`) — this option is introduced to properly handle Lokalise API rate limiting. If the HTTP status code 429 (too many requests) has been received, LokaliseManager will apply an exponential backoff mechanism with a very simple formula: `2 ** retries` (initially `retries` is `0`). If the maximum number of retries has been reached, a `RubyLokaliseApi::Error::TooManyRequests` exception will be raised and the export operation will be halted. By default, LokaliseManager will make up to `5` retries which potentially means `1 + 2 + 4 + 8 + 16 + 32 = 63` seconds of waiting time. If the `max_retries_export` is less than `1`, LokaliseManager will not perform any retries and give up immediately after receiving error 429.

@@ -161,6 +161,12 @@ describe LokaliseManager::GlobalConfig do
       fake_config.lang_iso_inferer = inferer
       expect(fake_config.lang_iso_inferer).to eq(inferer)
     end
+
+    it 'allows setting export_preprocessor' do
+      preprocessor = ->(data, _path) { data.upcase }
+      fake_config.export_preprocessor = preprocessor
+      expect(fake_config.export_preprocessor).to eq(preprocessor)
+    end
   end
 
   describe 'conditional settings' do
