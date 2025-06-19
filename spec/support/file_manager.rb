@@ -44,8 +44,6 @@ module FileManager
     File.open("#{Dir.getwd}/#{rel_path}", 'w+:UTF-8', &block)
   end
 
-  private
-
   def en_data
     <<~DATA
       en:
