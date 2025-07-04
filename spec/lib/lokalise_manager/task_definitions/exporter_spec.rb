@@ -228,6 +228,19 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
         expect(described_object.config).to have_received(:export_preprocessor)
       end
+
+      it 'runs filename generator' do
+        allow(described_object.config).to receive(:export_filename_generator).and_return(
+          ->(_full_path, relative_path) { relative_path.to_s.upcase }
+        )
+
+        paths = described_object.send(:all_files).flatten
+        opts = described_object.send(:opts, *paths)
+
+        expect(opts[:filename]).to eq(paths[1].to_s.upcase)
+
+        expect(described_object.config).to have_received(:export_filename_generator)
+      end
     end
 
     describe '#all_files' do

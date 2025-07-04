@@ -167,6 +167,12 @@ describe LokaliseManager::GlobalConfig do
       fake_config.export_preprocessor = preprocessor
       expect(fake_config.export_preprocessor).to eq(preprocessor)
     end
+
+    it 'allows setting export_filename_generator' do
+      filename_generator = ->(_full_path, relative_path) { relative_path.upcase }
+      fake_config.export_filename_generator = filename_generator
+      expect(fake_config.export_filename_generator).to eq(filename_generator)
+    end
   end
 
   describe 'conditional settings' do
