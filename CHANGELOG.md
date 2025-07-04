@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.4.0
+
+* Added a new export option `export_filename_generator` (`lambda` or `proc`) that allows to control the `filename` sent to Lokalise for each uploaded file. The lambda takes two arguments: full file path and relative path (both `Pathname` instances). The relative path is calculated based on your `locales_path` setting — it shows the file's location inside your locales folder. The lambda must return a string or `Pathname` (or anything convertible to string) with the desired filename. By default, the relative path is used as the filename.
+
+```ruby
+c.export_filename_generator = ->(_full_path, relative_path) { relative_path.to_s.upcase }
+```
+
 ## 6.3.0 (19-Jun-2025)
 
 * Added a new export option `export_preprocessor` (`lambda` or `proc`) that enables you to specify additional processing logic for your translation files' content before uploading to Lokalise. This option defaults to `->(raw_data, _path) { raw_data }` (no processing).

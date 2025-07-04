@@ -95,16 +95,16 @@ module LokaliseManager
       #
       # Reads and encodes the file content in Base64 before sending it to Lokalise.
       #
-      # @param full_p [Pathname] Full file path.
-      # @param relative_p [Pathname] Relative path within the project.
+      # @param full_path [Pathname] Full file path.
+      # @param relative_path [Pathname] Relative path within the project.
       # @return [Hash] Upload options including encoded content, filename, and language.
-      def opts(full_p, relative_p)
-        content = File.read(full_p).strip
+      def opts(full_path, relative_path)
+        content = File.read(full_path).strip
 
         {
-          data: Base64.strict_encode64(config.export_preprocessor.call(content, full_p)),
-          filename: relative_p.to_s,
-          lang_iso: config.lang_iso_inferer.call(content, full_p)
+          data: Base64.strict_encode64(config.export_preprocessor.call(content, full_path)),
+          filename: config.export_filename_generator.call(full_path, relative_path).to_s,
+          lang_iso: config.lang_iso_inferer.call(content, full_path)
         }.merge(config.export_opts)
       end
 
