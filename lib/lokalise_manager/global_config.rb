@@ -116,6 +116,7 @@ module LokaliseManager
         @export_preprocessor || ->(raw_data, _path) { raw_data }
       end
 
+      # Adjust filenames before exporting to Lokalise
       def export_filename_generator
         @export_filename_generator || ->(_full_path, relative_path) { relative_path }
       end

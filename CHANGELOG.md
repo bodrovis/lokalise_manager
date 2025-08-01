@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.5.0 (01-Aug-2025)
+
+* Relaxed rubyzip dependency, allow rubyzip v3
+* Test with Ruby 3.5
+
 ## 6.4.0 (04-Jul-2025)
 
 * Added a new export option `export_filename_generator` (`lambda` or `proc`) that allows to control the `filename` sent to Lokalise for each uploaded file. The lambda takes two arguments: full file path and relative path (both `Pathname` instances). The relative path is calculated based on your `locales_path` setting — it shows the file's location inside your locales folder. The lambda must return a string or `Pathname` (or anything convertible to string) with the desired filename. By default, the relative path is used as the filename.
