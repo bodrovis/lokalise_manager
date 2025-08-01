@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'base64', '~> 0.3.0'
   spec.add_dependency 'ruby-lokalise-api', '~> 9.3'
-  spec.add_dependency 'rubyzip', '~> 2.3'
+  spec.add_dependency 'rubyzip', '>= 2.3', '< 4.0'
   spec.add_dependency 'zeitwerk', '~> 2.4'
 
   spec.add_development_dependency 'dotenv', '~> 3.0'
