@@ -2,8 +2,8 @@
 
 ![Gem](https://img.shields.io/gem/v/lokalise_manager)
 ![CI](https://github.com/bodrovis/lokalise_manager/actions/workflows/ci.yml/badge.svg)
-[![Code Coverage](https://qlty.sh/badges/3c228b9b-c8b2-4a74-9619-f21fc79b8e83/test_coverage.svg)](https://qlty.sh/gh/bodrovis/projects/lokalise_manager)
-[![Maintainability](https://qlty.sh/badges/3c228b9b-c8b2-4a74-9619-f21fc79b8e83/maintainability.svg)](https://qlty.sh/gh/bodrovis/projects/lokalise_manager)
+[![Code Coverage](https://qlty.sh/gh/bodrovis/projects/lokalise_manager/coverage.svg)](https://qlty.sh/gh/bodrovis/projects/lokalise_manager)
+[![Maintainability](https://qlty.sh/gh/bodrovis/projects/lokalise_manager/maintainability.svg)](https://qlty.sh/gh/bodrovis/projects/lokalise_manager)
 ![Downloads total](https://img.shields.io/gem/dt/lokalise_manager)
 
 The LokaliseManager gem provides seamless integration with [Lokalise](http://lokalise.com), enabling easy exchange of translation files between your Ruby project and the Lokalise translation management system (TMS). It leverages the [ruby-lokalise-api](https://lokalise.github.io/ruby-lokalise-api) to send and manage APIv2 requests.
