@@ -25,7 +25,7 @@ jobs:
       LOKALISE_API_TOKEN: 123abc
       LOKALISE_PROJECT_ID: 672198945b7d72fc048021.15940510
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
