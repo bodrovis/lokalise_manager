@@ -23,8 +23,8 @@ module LokaliseManager
         check_options_errors!
 
         queued_processes = all_files.each_slice(MAX_THREADS).flat_map do |files_group|
-          parallel_upload(files_group).tap do |threads|
-            threads.each { |thr| raise_on_fail(thr) if config.raise_on_export_fail }
+          parallel_upload(files_group).tap do |results|
+            results.each { |result| raise_on_fail(result) if config.raise_on_export_fail }
           end
         end
 
@@ -45,13 +45,13 @@ module LokaliseManager
         end.map(&:value)
       end
 
-      # Raises an error if a file upload thread failed.
+      # Raises an error if a file upload result failed.
       #
-      # @param thread [Struct] The result of the file upload thread.
-      def raise_on_fail(thread)
-        return if thread.success
+      # @param result [Struct] The result of the file upload thread.
+      def raise_on_fail(result)
+        return if result.success
 
-        raise thread.error
+        raise result.error
       end
 
       # Uploads a single file to Lokalise.
