@@ -73,8 +73,8 @@ module LokaliseManager
                        .singleton_methods
                        .select { |m| m.to_s.end_with?('=') }
                        .each_with_object({}) do |method, opts|
-          reader = method.to_s.delete_suffix('=')
-          opts[reader.to_sym] = global_config.public_send(reader)
+                         reader = method.to_s.delete_suffix('=')
+                         opts[reader.to_sym] = global_config.public_send(reader)
         end
 
         primary_opts.deep_merge(custom_opts)
