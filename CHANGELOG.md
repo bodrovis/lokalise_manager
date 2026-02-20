@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 7.0.0 (26-Feb-2026)
 
+* Strengthen config options
 * Various code updates and enhancements
 * Test with Ruby 4
 
