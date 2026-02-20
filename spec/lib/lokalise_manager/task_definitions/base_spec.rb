@@ -5,76 +5,70 @@ describe LokaliseManager::TaskDefinitions::Base do
 
   describe '.new' do
     it 'allows to override config' do
-      obj = described_class.new token: 'fake'
-      expect(obj.config.token).to eq('fake')
+      obj = described_class.new api_token: 'fake'
+      expect(obj.config.api_token).to eq('fake')
+    end
+
+    it 'lists all unknown config keys in the error message' do
+      expect do
+        described_class.new(wtf_key: 'nope', another_one: 123)
+      end.to raise_error(LokaliseManager::Error) { |e|
+        expect(e.message).to match(/Unknown config keys:/)
+        expect(e.message).to include('wtf_key')
+        expect(e.message).to include('another_one')
+      }
     end
   end
 
   describe '#config' do
     it 'allows to update config after initialization' do
-      obj = described_class.new token: 'fake', project_id: '123'
+      obj = described_class.new api_token: 'fake', project_id: '123'
 
       obj.config.project_id = '345'
 
       expect(obj.config.project_id).to eq('345')
-      expect(obj.config.token).to eq('fake')
+      expect(obj.config.api_token).to eq('fake')
     end
   end
 
-  specify '.reset_client!' do
+  specify '.reset_api_client!' do
     expect(described_object.api_client).to be_an_instance_of(RubyLokaliseApi::Client)
     described_object.reset_api_client!
     current_client = described_object.instance_variable_get :@api_client
     expect(current_client).to be_nil
   end
 
-  specify '.project_id_with_branch!' do
-    result = described_object.send :project_id_with_branch
-    expect(result).to be_an_instance_of(String)
-    expect(result).not_to include(':master')
+  specify '.project_id_with_branch' do
+    obj = described_class.new(api_token: 't', project_id: '123')
 
-    described_object.config.branch = 'develop'
-    result = described_object.send :project_id_with_branch
-    expect(result).to be_an_instance_of(String)
-    expect(result).to include(':develop')
-  end
+    expect(obj.send(:project_id_with_branch)).to eq('123')
 
-  describe '.subdir_and_filename_for' do
-    it 'works properly for longer paths' do
-      path = 'my_path/is/here/file.yml'
-      result = described_object.send(:subdir_and_filename_for, path)
-      expect(result.length).to eq(2)
-      expect(result[0]).to be_an_instance_of(Pathname)
-      expect(result[0].to_s).to eq('my_path/is/here')
-      expect(result[1].to_s).to eq('file.yml')
-    end
+    obj.config.branch = 'develop'
+    expect(obj.send(:project_id_with_branch)).to eq('123:develop')
 
-    it 'works properly for shorter paths' do
-      path = 'file.yml'
-      result = described_object.send(:subdir_and_filename_for, path)
-      expect(result.length).to eq(2)
-      expect(result[1]).to be_an_instance_of(Pathname)
-      expect(result[0].to_s).to eq('.')
-      expect(result[1].to_s).to eq('file.yml')
-    end
+    obj.config.branch = '   '
+    expect(obj.send(:project_id_with_branch)).to eq('123')
   end
 
   describe '.check_options_errors!' do
     it 'raises an error when the API key is not set' do
       allow(LokaliseManager::GlobalConfig).to receive(:api_token).and_return(nil)
 
+      obj = described_class.new(project_id: '123') # ensure project_id
+
       expect do
-        described_object.send(:check_options_errors!)
+        obj.send(:check_options_errors!)
       end.to raise_error(LokaliseManager::Error, /API token is not set/i)
 
       expect(LokaliseManager::GlobalConfig).to have_received(:api_token)
     end
 
-    it 'returns an error when the project_id is not set' do
-      allow_project_id described_object, nil do
-        expect do
-          described_object.send(:check_options_errors!)
-        end.to raise_error(LokaliseManager::Error, /ID is not set/i)
+    it 'raises an error when the project_id is not set' do
+      obj = described_class.new(api_token: 't', project_id: '123')
+
+      allow_project_id obj, nil do
+        expect { obj.send(:check_options_errors!) }
+          .to raise_error(LokaliseManager::Error, /ID is not set/i)
       end
     end
   end
@@ -120,13 +114,36 @@ describe LokaliseManager::TaskDefinitions::Base do
       expect(client.api_host).to eq(api_host)
     end
 
-    it 'uses .oauth_client when the use_oauth2_token is true' do
+    it 'uses .oauth2_client when the use_oauth2_token is true' do
       allow(described_object.config).to receive(:use_oauth2_token).and_return(true)
 
       client = described_object.api_client
 
       expect(client).to be_an_instance_of(RubyLokaliseApi::OAuth2Client)
       expect(client).not_to be_an_instance_of(RubyLokaliseApi::Client)
+    end
+  end
+
+  describe '#with_exp_backoff' do
+    let(:obj) { described_class.new(api_token: 't', project_id: 'p') }
+
+    before do
+      stub_const("#{described_class}::BACKOFF_JITTER_RANGE", 0.0)
+      allow(obj).to receive(:sleep)
+    end
+
+    it 'retries with exponential delays' do
+      calls = 0
+      expect do
+        obj.send(:with_exp_backoff, 2) do
+          calls += 1
+          raise RubyLokaliseApi::Error::TooManyRequests if calls <= 3
+        end
+      end.to raise_error(RubyLokaliseApi::Error::TooManyRequests)
+
+      expect(obj).to have_received(:sleep).with(1.0).ordered
+      expect(obj).to have_received(:sleep).with(2.0).ordered
+      expect(obj).to have_received(:sleep).exactly(2).times
     end
   end
 end

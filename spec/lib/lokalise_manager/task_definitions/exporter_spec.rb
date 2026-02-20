@@ -27,20 +27,20 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           process = nil
 
           stub_upload({
-                        data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                        data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiIK',
                         filename: 'nested/en.yml',
                         lang_iso: 'en'
                       }, 'upload_nested.json')
 
           stub_upload({
-                        data: 'cnVfUlU6CiAgbXlfa2V5OiAi0JzQvtGRINC30L3QsNGH0LXQvdC40LUiCiAgbmVzdGVkOgog' \
-                              'ICAga2V5OiAi0JfQvdCw0YfQtdC90LjQtSAyIg==',
+                        data: 'cnVfUlU6CiAgbXlfa2V5OiAi0JzQvtGRINC30L3QsNGH0LXQvdC40LUiCiAgbmVzdGVkOgogIC' \
+                              'Aga2V5OiAi0JfQvdCw0YfQtdC90LjQtSAyIgo=',
                         filename: 'ru.yml',
                         lang_iso: 'ru_RU'
                       }, 'upload_ru.json')
 
           stub_upload({
-                        data: 'LS0tCmVuOgogIGtleV8wOiB2YWx1ZSAw', filename: 'en_0.yml', lang_iso: 'en'
+                        data: 'LS0tCmVuOgogIGtleV8wOiB2YWx1ZSAwCg==', filename: 'en_0.yml', lang_iso: 'en'
                       }, 'upload0.json')
 
           expect { process = described_object.export!.first.process }.to output(/complete!/).to_stdout
@@ -63,7 +63,6 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           allow(described_object.config).to receive_messages(max_retries_export: 1, raise_on_export_fail: false)
 
           fake_client = instance_double(RubyLokaliseApi::Client)
-          allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
           allow(fake_client).to receive(:upload_file).with(any_args).and_raise(RubyLokaliseApi::Error::TooManyRequests)
           allow(described_object).to receive_messages(sleep: 0, api_client: fake_client)
           processes = []
@@ -82,7 +81,6 @@ describe LokaliseManager::TaskDefinitions::Exporter do
           allow(described_object.config).to receive_messages(max_retries_export: 1, raise_on_export_fail: false)
 
           fake_client = instance_double(RubyLokaliseApi::Client)
-          allow(fake_client).to receive(:token).with(any_args).and_return('fake_token')
           allow(fake_client).to receive(:upload_file).with(any_args).and_raise(JSON::ParserError)
           allow(described_object).to receive_messages(sleep: 0, api_client: fake_client)
           processes = []
@@ -156,7 +154,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         process = nil
 
         stub_upload({
-                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiIK',
                       filename: 'nested/en.yml',
                       lang_iso: 'en'
                     }, 'upload_nested.json')
@@ -169,7 +167,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
 
       it 'sends a proper API request' do
         stub_upload({
-                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiIK',
                       filename: 'nested/en.yml',
                       lang_iso: 'en'
                     }, 'upload_nested.json')
@@ -184,7 +182,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         allow(described_object.config).to receive(:branch).and_return('develop')
 
         stub_upload({
-                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiIK',
                       filename: 'nested/en.yml',
                       lang_iso: 'en'
                     }, 'upload_nested.json', project_id: "#{ENV.fetch('LOKALISE_PROJECT_ID', nil)}:develop")
@@ -223,7 +221,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         paths = described_object.send(:all_files).flatten
         opts = described_object.send(:opts, *paths)
 
-        demo_content = File.read(paths[0]).strip
+        demo_content = File.read(paths[0], mode: 'r:UTF-8')
         expect(opts[:data]).to eq(Base64.strict_encode64(demo_content.upcase))
 
         expect(described_object.config).to have_received(:export_preprocessor)
@@ -253,7 +251,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
     end
 
     describe '.opts' do
-      let(:base64content) { Base64.strict_encode64(File.read(path).strip) }
+      let(:base64content) { Base64.strict_encode64(File.read(path, mode: 'r:UTF-8')) }
 
       it 'generates proper options' do
         resulting_opts = described_object.send(:opts, path, relative_name)
@@ -296,14 +294,14 @@ describe LokaliseManager::TaskDefinitions::Exporter do
     describe '.export!' do
       it 're-raises export errors' do
         stub_upload({
-                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiI=',
+                      data: 'ZW46CiAgbXlfa2V5OiAiTXkgdmFsdWUiCiAgbmVzdGVkOgogICAga2V5OiAiVmFsdWUgMiIK',
                       filename: 'nested/en.yml',
                       lang_iso: 'en'
                     }, 'upload_nested.json')
 
         stub_upload({
-                      data: 'cnVfUlU6CiAgbXlfa2V5OiAi0JzQvtGRINC30L3QsNGH0LXQvdC40LUiCiAgbmVzdGVkOgog' \
-                            'ICAga2V5OiAi0JfQvdCw0YfQtdC90LjQtSAyIg==',
+                      data: 'cnVfUlU6CiAgbXlfa2V5OiAi0JzQvtGRINC30L3QsNGH0LXQvdC40LUiCiAgbmVzdGVkOgogI' \
+                            'CAga2V5OiAi0JfQvdCw0YfQtdC90LjQtSAyIgo=',
                       filename: 'ru.yml',
                       lang_iso: 'ru_RU'
                     }, 'unknown_lang_iso.json', status: 400)
@@ -313,7 +311,7 @@ describe LokaliseManager::TaskDefinitions::Exporter do
     end
 
     describe '.opts' do
-      let(:base64content_ru) { Base64.strict_encode64(File.read(path_ru).strip) }
+      let(:base64content_ru) { Base64.strict_encode64(File.read(path_ru, mode: 'r:UTF-8')) }
 
       it 'generates proper options' do
         resulting_opts = described_object.send(:opts, path_ru, filename_ru)
@@ -321,6 +319,16 @@ describe LokaliseManager::TaskDefinitions::Exporter do
         expect(resulting_opts[:data]).to eq(base64content_ru)
         expect(resulting_opts[:filename]).to eq(filename_ru)
         expect(resulting_opts[:lang_iso]).to eq('ru_RU')
+      end
+
+      it 'does not trim file content' do
+        tmp = File.join(Dir.getwd, 'locales', 'tmp.yml')
+        File.write(tmp, "en:\n  a: \"b\"\n")
+
+        opts = described_object.send(:opts, tmp, 'tmp.yml')
+        expect(Base64.decode64(opts[:data])).to eq("en:\n  a: \"b\"\n")
+      ensure
+        FileUtils.rm_f(tmp)
       end
     end
 

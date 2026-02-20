@@ -99,7 +99,7 @@ module LokaliseManager
       # @param relative_path [Pathname] Relative path within the project.
       # @return [Hash] Upload options including encoded content, filename, and language.
       def opts(full_path, relative_path)
-        content = File.read(full_path).strip
+        content = File.read(full_path, mode: 'r:UTF-8')
 
         {
           data: Base64.strict_encode64(config.export_preprocessor.call(content, full_path)),

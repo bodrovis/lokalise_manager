@@ -23,6 +23,18 @@ module LokaliseManager
       # - `RubyLokaliseApi::Error::TooManyRequests`: Raised when too many requests are sent in a short period.
       EXCEPTIONS = [JSON::ParserError, RubyLokaliseApi::Error::TooManyRequests].freeze
 
+      # All configuration-related keys
+      CONFIG_KEYS = %i[
+        api_token project_id import_opts import_safe_mode export_opts locales_path file_ext_regexp
+        skip_file_export branch additional_client_opts translations_loader translations_converter
+        lang_iso_inferer max_retries_export max_retries_import use_oauth2_token silent_mode
+        raise_on_export_fail import_async export_preprocessor export_filename_generator
+      ].freeze
+
+      BACKOFF_BASE_SECONDS = 1 # base multiplier (1,2,4,8...)
+      BACKOFF_CAP_SECONDS  = 32         # max sleep cap
+      BACKOFF_JITTER_RANGE = 1.0        # adds rand * range
+
       # Initializes a new task object with merged global and custom configurations.
       #
       # @param custom_opts [Hash] Custom configuration options specific to the task.
@@ -69,13 +81,12 @@ module LokaliseManager
       # @param custom_opts [Hash] The custom configuration options.
       # @return [Hash] The merged configuration.
       def merge_configs(global_config, custom_opts)
-        primary_opts = global_config
-                       .singleton_methods
-                       .select { |m| m.to_s.end_with?('=') }
-                       .each_with_object({}) do |method, opts|
-                         reader = method.to_s.delete_suffix('=')
-                         opts[reader.to_sym] = global_config.public_send(reader)
-        end
+        primary_opts = CONFIG_KEYS.to_h { |k| [k, global_config.public_send(k)] }
+
+        custom_opts = custom_opts.transform_keys(&:to_sym)
+
+        unknown = custom_opts.keys - CONFIG_KEYS
+        raise LokaliseManager::Error, "Unknown config keys: #{unknown.join(', ')}" if unknown.any?
 
         primary_opts.deep_merge(custom_opts)
       end
@@ -109,14 +120,6 @@ module LokaliseManager
         config.file_ext_regexp.match? path.extname
       end
 
-      # Extracts the subdirectory and filename from a given path.
-      #
-      # @param entry [String] The file path.
-      # @return [Array<Pathname, Pathname>] An array containing the subdirectory and filename.
-      def subdir_and_filename_for(entry)
-        Pathname.new(entry).split
-      end
-
       # Constructs a Lokalise project identifier that may include a branch.
       #
       # If a branch is specified, the project ID is formatted as `project_id:branch`.
@@ -136,16 +139,39 @@ module LokaliseManager
       def with_exp_backoff(max_retries)
         return unless block_given?
 
+        max_retries = max_retries.to_i
+        max_retries = 0 if max_retries.negative?
+
         retries = 0
+
         begin
           yield
         rescue *EXCEPTIONS => e
-          raise(e.class, "Gave up after #{retries} retries") if retries >= max_retries
+          raise_on_max_retries(retries, max_retries, e)
 
-          sleep 2**retries
+          sleep_with_backoff(retries)
+
           retries += 1
           retry
         end
+      end
+
+      def sleep_with_backoff(retries)
+        base_sleep = BACKOFF_BASE_SECONDS.to_f * (2**retries)
+        capped = [base_sleep, BACKOFF_CAP_SECONDS.to_f].min
+        jitter = BACKOFF_JITTER_RANGE.to_f <= 0 ? 0.0 : rand * BACKOFF_JITTER_RANGE.to_f
+        sleep(capped + jitter)
+      end
+
+      def raise_on_max_retries(retries, max_retries, error)
+        # We already failed (retries+1) times total including this one.
+        return unless retries >= max_retries
+
+        # Preserve original exception class + backtrace, but add context.
+        attempts = retries + 1
+        raise error.class,
+              "Gave up after #{retries} retries (#{attempts} attempts). Last error: #{error.class}: #{error.message}",
+              error.backtrace
       end
     end
   end

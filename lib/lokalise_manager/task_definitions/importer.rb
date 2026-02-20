@@ -72,13 +72,14 @@ module LokaliseManager
       # @raise [LokaliseManager::Error] If the process fails or takes too long.
       def wait_for_async_download(process_id)
         (config.max_retries_import + 1).times do |i|
-          sleep 2**i
           process = reload_process(process_id)
 
           case process.status
           when 'failed' then raise LokaliseManager::Error, 'Asynchronous download process failed'
           when 'finished' then return process
           end
+
+          sleep_with_backoff(i)
         end
 
         raise LokaliseManager::Error, "Asynchronous download process timed out after #{config.max_retries_import} tries"
@@ -96,9 +97,12 @@ module LokaliseManager
       #
       # @param path [String] The URL or local path to the ZIP archive.
       def open_and_process_zip(path)
-        Zip::File.open_buffer(open_file_or_remote(path)) do |zip|
+        io = open_file_or_remote(path)
+        Zip::File.open_buffer(io) do |zip|
           zip.each { |entry| process_entry(entry) if proper_ext?(entry.name) }
         end
+      ensure
+        io.close if io && !io.closed?
       end
 
       # Extracts data from a ZIP entry and writes it to the correct directory.
@@ -110,10 +114,22 @@ module LokaliseManager
       # @param zip_entry [Zip::Entry] The ZIP entry to process.
       def process_entry(zip_entry)
         data = data_from(zip_entry)
-        full_path = File.join(config.locales_path, *subdir_and_filename_for(zip_entry.name))
-        FileUtils.mkdir_p File.dirname(full_path)
+        dest = safe_dest_path(zip_entry.name)
+        return unless dest
 
-        File.write(full_path, config.translations_converter.call(data), mode: 'w+:UTF-8')
+        FileUtils.mkdir_p(dest.dirname)
+        File.write(dest, config.translations_converter.call(data), mode: 'w:UTF-8')
+      end
+
+      def safe_dest_path(entry_name)
+        base = Pathname.new(config.locales_path).expand_path
+        normalized = entry_name.tr('\\', '/')
+        dest = base.join(normalized).cleanpath
+        base_s = base.to_s
+        dest_s = dest.to_s
+        return nil unless dest_s == base_s || dest_s.start_with?(base_s + File::SEPARATOR)
+
+        dest
       end
 
       # Checks whether the import should proceed under safe mode constraints.
@@ -123,9 +139,12 @@ module LokaliseManager
       #
       # @return [Boolean] `true` if the import should proceed, `false` otherwise.
       def proceed_when_safe_mode?
-        return true unless config.import_safe_mode && !Dir.empty?(config.locales_path.to_s)
+        path = config.locales_path.to_s
+        return true unless config.import_safe_mode
+        return true unless Dir.exist?(path)
+        return true if Dir.empty?(path)
 
-        $stdout.puts "The target directory #{config.locales_path} is not empty!"
+        $stdout.puts "The target directory #{path} is not empty!"
         $stdout.print 'Enter Y to continue: '
         $stdin.gets.strip.upcase == 'Y'
       end
@@ -136,7 +155,7 @@ module LokaliseManager
       # @return [IO] An IO object for reading the file.
       def open_file_or_remote(path)
         uri = URI.parse(path)
-        uri.scheme&.start_with?('http') ? uri.open : File.open(path)
+        uri.scheme&.start_with?('http') ? uri.open(open_timeout: 10, read_timeout: 60) : File.open(path)
       end
 
       # Reads and processes data from a ZIP file entry.
@@ -153,6 +172,14 @@ module LokaliseManager
       # @return [Object] The result of the successful operation.
       def fetch_with_retry(&block)
         with_exp_backoff(config.max_retries_import, &block)
+      end
+
+      # Extracts the subdirectory and filename from a given path.
+      #
+      # @param entry [String] The file path.
+      # @return [Array<Pathname, Pathname>] An array containing the subdirectory and filename.
+      def subdir_and_filename_for(entry)
+        Pathname.new(entry).split
       end
     end
   end

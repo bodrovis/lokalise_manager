@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Various code updates and enhancements
+* Test with Ruby 4
+
 ## 6.5.0 (01-Aug-2025)
 
 * Relaxed rubyzip dependency, allow rubyzip v3

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'zeitwerk'
-require 'yaml'
 
 loader = Zeitwerk::Loader.for_gem
 loader.setup
@@ -38,7 +37,7 @@ module LokaliseManager
     # ```
     #
     def importer(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
-      LokaliseManager::TaskDefinitions::Importer.new custom_opts, global_config
+      TaskDefinitions::Importer.new custom_opts, global_config
     end
 
     # Instantiates an exporter for uploading translation files to Lokalise.
@@ -54,7 +53,7 @@ module LokaliseManager
     # ```
     #
     def exporter(custom_opts = {}, global_config = LokaliseManager::GlobalConfig)
-      LokaliseManager::TaskDefinitions::Exporter.new custom_opts, global_config
+      TaskDefinitions::Exporter.new custom_opts, global_config
     end
   end
 end

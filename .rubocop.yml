@@ -2,7 +2,7 @@ plugins:
  - rubocop-performance
  - rubocop-rspec
  - rubocop-rake
-
+ 
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
@@ -13,6 +13,9 @@ Metrics/BlockLength:
     - spec/**/*.rb
     - lokalise_manager.gemspec
 
+Metrics/MethodLength:
+  Max: 15
+  
 RSpec/MultipleExpectations:
   Max: 10
 

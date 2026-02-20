@@ -3,6 +3,14 @@
 describe LokaliseManager::GlobalConfig do
   let(:fake_config) { Class.new(described_class) }
 
+  before do
+    fake_config.instance_variables.each do |ivar|
+      fake_config.remove_instance_variable(ivar)
+    end
+    fake_config.api_token = nil
+    fake_config.project_id = nil
+  end
+
   describe 'configuration management' do
     it 'yields itself during configuration block' do
       fake_config.config do |c|
@@ -172,6 +180,10 @@ describe LokaliseManager::GlobalConfig do
       filename_generator = ->(_full_path, relative_path) { relative_path.upcase }
       fake_config.export_filename_generator = filename_generator
       expect(fake_config.export_filename_generator).to eq(filename_generator)
+    end
+
+    it 'does not accept unknown config attributes' do
+      expect { fake_config.wtf = 1 }.to raise_error(NoMethodError)
     end
   end
 

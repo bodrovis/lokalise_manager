@@ -41,7 +41,7 @@ module FileManager
   def open_and_write(rel_path, &block)
     return unless block
 
-    File.open("#{Dir.getwd}/#{rel_path}", 'w+:UTF-8', &block)
+    File.open("#{Dir.getwd}/#{rel_path}", 'w:UTF-8', &block)
   end
 
   private

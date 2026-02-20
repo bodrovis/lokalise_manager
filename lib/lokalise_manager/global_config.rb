@@ -34,7 +34,7 @@ module LokaliseManager
 
       # Return the path to locales
       def locales_path
-        @locales_path || "#{Dir.getwd}/locales"
+        @locales_path || File.join(Dir.pwd, 'locales')
       end
 
       # Return the project branch

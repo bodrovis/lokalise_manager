@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'yaml'
+
 describe LokaliseManager::TaskDefinitions::Importer do
   let(:described_object) do
     described_class.new project_id: project_id,
@@ -78,7 +80,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
       expect { described_object.send(:wait_for_async_download, process_id) }
         .to raise_error(LokaliseManager::Error, 'Asynchronous download process failed')
 
-      expect(described_object).to have_received(:sleep).exactly(1).times
+      expect(described_object).to have_received(:sleep).exactly(0).times
     end
 
     it 'raises an error when retries have been exhausted' do
@@ -93,6 +95,26 @@ describe LokaliseManager::TaskDefinitions::Importer do
                         "Asynchronous download process timed out after #{max_retries} tries")
 
       expect(described_object).to have_received(:sleep).exactly(max_retries + 1).times
+    end
+  end
+
+  describe '#subdir_and_filename_for' do
+    it 'works properly for longer paths' do
+      path = 'my_path/is/here/file.yml'
+      result = described_object.send(:subdir_and_filename_for, path)
+      expect(result.length).to eq(2)
+      expect(result[0]).to be_an_instance_of(Pathname)
+      expect(result[0].to_s).to eq('my_path/is/here')
+      expect(result[1].to_s).to eq('file.yml')
+    end
+
+    it 'works properly for shorter paths' do
+      path = 'file.yml'
+      result = described_object.send(:subdir_and_filename_for, path)
+      expect(result.length).to eq(2)
+      expect(result[1]).to be_an_instance_of(Pathname)
+      expect(result[0].to_s).to eq('.')
+      expect(result[1].to_s).to eq('file.yml')
     end
   end
 
@@ -336,6 +358,25 @@ describe LokaliseManager::TaskDefinitions::Importer do
         expect($stdin).to have_received(:gets)
         expect(count_translations).to eq(1)
       end
+    end
+  end
+
+  describe '#safe_dest_path' do
+    let(:obj) { described_class.new(project_id: 'p', api_token: 't') }
+
+    it 'returns a path inside locales_path for normal entries' do
+      dest = obj.send(:safe_dest_path, 'en/main.yml')
+      expect(dest.to_s).to include(File.join(obj.config.locales_path, 'en', 'main.yml'))
+    end
+
+    it 'rejects path traversal' do
+      dest = obj.send(:safe_dest_path, '../../pwn.yml')
+      expect(dest).to be_nil
+    end
+
+    it 'normalizes backslashes' do
+      dest = obj.send(:safe_dest_path, 'en\\main.yml')
+      expect(dest.to_s).to end_with(File.join('en', 'main.yml'))
     end
   end
 end
