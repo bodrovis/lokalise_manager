@@ -10,6 +10,8 @@ The LokaliseManager gem provides seamless integration with [Lokalise](http://lok
 
 For integration directly with Rails applications, refer to [lokalise_rails](https://github.com/bodrovis/lokalise_rails), which offers a suite of Rake tasks specifically designed for importing and exporting translation files.
 
+> Find demo scripts showcasing lokalise_manager usage in the [lokalise_manager_demo repo](https://github.com/bodrovis/lokalise_manager_demo).
+
 ## Getting Started
 
 ### Requirements
