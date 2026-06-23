@@ -13,7 +13,7 @@ describe LokaliseManager::TaskDefinitions::Base do
       expect do
         described_class.new(wtf_key: 'nope', another_one: 123)
       end.to raise_error(LokaliseManager::Error) { |e|
-        expect(e.message).to match(/Unknown config keys:/)
+        expect(e.message).to include('Unknown config keys:')
         expect(e.message).to include('wtf_key')
         expect(e.message).to include('another_one')
       }
