@@ -16,7 +16,7 @@ For integration directly with Rails applications, refer to [lokalise_rails](http
 
 ### Requirements
 
-- **Ruby version**: Ruby 3.0 or higher is required.
+- **Ruby version**: Ruby 3.2 or higher is required.
 - **Lokalise account**: You must have an active [Lokalise account](https://app.lokalise.com/signup).
 - **Project setup**: Create a [translation project](https://docs.lokalise.com/en/articles/1400460-projects) within your Lokalise account.
 - **API token**: Obtain a read/write [API token](https://docs.lokalise.com/en/articles/1929556-api-tokens) from your Lokalise profile.
