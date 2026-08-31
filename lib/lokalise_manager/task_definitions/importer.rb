@@ -71,7 +71,9 @@ module LokaliseManager
       # @return [QueuedProcess] The process object when completed successfully.
       # @raise [LokaliseManager::Error] If the process fails or takes too long.
       def wait_for_async_download(process_id)
-        (config.max_retries_import + 1).times do |i|
+        max_retries = [config.max_retries_import.to_i, 0].max
+
+        (max_retries + 1).times do |i|
           process = reload_process(process_id)
 
           case process.status
@@ -79,7 +81,7 @@ module LokaliseManager
           when 'finished' then return process
           end
 
-          sleep_with_backoff(i)
+          sleep_with_backoff(i) if i < max_retries
         end
 
         raise LokaliseManager::Error, "Asynchronous download process timed out after #{config.max_retries_import} tries"
@@ -90,7 +92,9 @@ module LokaliseManager
       # @param process_id [String] The process ID to check.
       # @return [QueuedProcess] The process object with updated status.
       def reload_process(process_id)
-        api_client.queued_process project_id_with_branch, process_id
+        fetch_with_retry do
+          api_client.queued_process(project_id_with_branch, process_id)
+        end
       end
 
       # Extracts and processes files from a ZIP archive.
@@ -146,7 +150,7 @@ module LokaliseManager
 
         $stdout.puts "The target directory #{path} is not empty!"
         $stdout.print 'Enter Y to continue: '
-        $stdin.gets.strip.upcase == 'Y'
+        $stdin.gets&.strip&.upcase == 'Y'
       end
 
       # Opens a local file or downloads a remote file.
@@ -170,16 +174,8 @@ module LokaliseManager
       #
       # @yield The operation to retry.
       # @return [Object] The result of the successful operation.
-      def fetch_with_retry(&block)
-        with_exp_backoff(config.max_retries_import, &block)
-      end
-
-      # Extracts the subdirectory and filename from a given path.
-      #
-      # @param entry [String] The file path.
-      # @return [Array<Pathname, Pathname>] An array containing the subdirectory and filename.
-      def subdir_and_filename_for(entry)
-        Pathname.new(entry).split
+      def fetch_with_retry(&)
+        with_exp_backoff(config.max_retries_import, &)
       end
     end
   end

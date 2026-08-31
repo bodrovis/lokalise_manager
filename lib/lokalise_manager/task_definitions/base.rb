@@ -31,8 +31,8 @@ module LokaliseManager
         raise_on_export_fail import_async export_preprocessor export_filename_generator
       ].freeze
 
-      BACKOFF_BASE_SECONDS = 1 # base multiplier (1,2,4,8...)
-      BACKOFF_CAP_SECONDS  = 32         # max sleep cap
+      BACKOFF_BASE_SECONDS = 1          # base multiplier (1,2,4,8...)
+      BACKOFF_CAP_SECONDS = 32          # max exponential backoff before jitter
       BACKOFF_JITTER_RANGE = 1.0        # adds rand * range
 
       # Initializes a new task object with merged global and custom configurations.

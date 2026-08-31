@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'yaml'
+
 module LokaliseManager
   # GlobalConfig provides a central place to manage configuration settings for LokaliseManager.
   # It allows setting various operational parameters such as API tokens, paths, and behavior modifiers.

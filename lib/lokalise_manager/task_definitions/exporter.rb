@@ -6,7 +6,7 @@ module LokaliseManager
   module TaskDefinitions
     # Handles exporting translation files from a local project to Lokalise.
     class Exporter < Base
-      # Maximum number of concurrent uploads to avoid exceeding Lokalise API rate limits.
+      # Number of files uploaded concurrently in each batch.
       MAX_THREADS = 6
 
       ProcessResult = Struct.new(:success, :process, :path, :error, keyword_init: true)
@@ -15,7 +15,7 @@ module LokaliseManager
       #
       # - Validates configuration.
       # - Gathers translation files from the project directory.
-      # - Uploads files to Lokalise in parallel, respecting API rate limits.
+      # - Uploads files to Lokalise in parallel and retries rate-limited requests.
       # - Handles errors and ensures failed uploads are reported.
       #
       # @return [Array] An array of process results for each uploaded file.

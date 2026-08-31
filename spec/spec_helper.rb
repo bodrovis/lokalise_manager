@@ -5,8 +5,8 @@ require 'simplecov'
 require 'webmock/rspec'
 
 SimpleCov.start do
-  add_filter 'spec/'
-  add_filter '.github/'
+  skip 'spec/'
+  skip '.github/'
 end
 
 require_relative '../lib/lokalise_manager'

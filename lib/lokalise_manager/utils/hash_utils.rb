@@ -6,7 +6,7 @@ module LokaliseManager
     module HashUtils
       refine Hash do
         # Deeply merges two hashes
-        # Taken from https://github.com/rails/rails/blob/83217025a171593547d1268651b446d3533e2019/activesupport/lib/active_support/core_ext/hash/deep_merge.rb
+        # Taken from https://api.rubyonrails.org/files/activesupport/lib/active_support/core_ext/hash/deep_merge_rb.html
         def deep_merge(other_hash, &block)
           dup.deep_merge!(other_hash, &block)
         end

@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.0.0 (26-Feb-2026)
+
+* **Require Ruby 3.2+**
+* Various code updates and enhancements
+
 ## 7.0.0 (26-Feb-2026)
 
 * Strengthen config options
