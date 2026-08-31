@@ -1,6 +1,6 @@
 # Changelog
 
-## 8.0.0 (26-Feb-2026)
+## 8.0.0 (31-Aug-2026)
 
 * **Require Ruby 3.2+**
 * Various code updates and enhancements
