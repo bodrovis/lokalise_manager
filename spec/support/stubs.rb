@@ -39,7 +39,7 @@ module Stubs
     req_params = {
       headers: {
         'Accept' => 'application/json',
-        'Accept-Encoding' => 'gzip,deflate,br',
+        'Accept-Encoding' => 'gzip,deflate',
         'User-Agent' => "ruby-lokalise-api gem/#{RubyLokaliseApi::VERSION}",
         'X-Api-Token' => ENV.fetch('LOKALISE_API_TOKEN', nil)
       }

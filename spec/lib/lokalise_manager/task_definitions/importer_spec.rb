@@ -164,7 +164,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
           'bundle_url' => local_trans
         }
         allow(described_object).to receive(:download_files).and_return(
-          RubyLokaliseApi::Generics::DownloadBundle.new(data)
+          RubyLokaliseApi::OperationResults::DownloadBundle.new(data)
         )
 
         expect(described_object.import!).to be true
@@ -182,7 +182,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
           'bundle_url' => local_trans
         }
         allow(described_object).to receive(:download_files).and_return(
-          RubyLokaliseApi::Generics::DownloadBundle.new(data)
+          RubyLokaliseApi::OperationResults::DownloadBundle.new(data)
         )
 
         result = nil
@@ -230,7 +230,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
           'bundle_url' => local_trans_slashes
         }
 
-        allow(importer).to receive(:download_files).and_return(RubyLokaliseApi::Generics::DownloadBundle.new(data))
+        allow(importer).to receive(:download_files).and_return(RubyLokaliseApi::OperationResults::DownloadBundle.new(data))
 
         stub_download(common_params.merge({ replace_breaks: false }), 'import.json')
 
@@ -249,7 +249,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
           'project_id' => '123.abc',
           'bundle_url' => local_trans_slashes
         }
-        allow(importer).to receive(:download_files).and_return(RubyLokaliseApi::Generics::DownloadBundle.new(data))
+        allow(importer).to receive(:download_files).and_return(RubyLokaliseApi::OperationResults::DownloadBundle.new(data))
 
         stub_download(common_params, 'import.json')
 
@@ -266,7 +266,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
         }
 
         allow(described_object).to receive(:download_files).and_return(
-          RubyLokaliseApi::Generics::DownloadBundle.new(data)
+          RubyLokaliseApi::OperationResults::DownloadBundle.new(data)
         )
 
         allow(described_object.config).to receive(:silent_mode).and_return(true)
@@ -304,7 +304,7 @@ describe LokaliseManager::TaskDefinitions::Importer do
           'project_id' => '123.abc',
           'bundle_url' => local_trans
         }
-        allow(safe_mode_obj).to receive(:download_files).and_return(RubyLokaliseApi::Generics::DownloadBundle.new(data))
+        allow(safe_mode_obj).to receive(:download_files).and_return(RubyLokaliseApi::OperationResults::DownloadBundle.new(data))
 
         allow($stdin).to receive(:gets).and_return('Y')
         expect { safe_mode_obj.import! }.to output(/is not empty/).to_stdout
