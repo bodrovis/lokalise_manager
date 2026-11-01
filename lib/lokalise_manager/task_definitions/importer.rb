@@ -117,9 +117,12 @@ module LokaliseManager
       #
       # @param zip_entry [Zip::Entry] The ZIP entry to process.
       def process_entry(zip_entry)
-        data = data_from(zip_entry)
+        return unless zip_entry.file? && !zip_entry.symlink?
+
         dest = safe_dest_path(zip_entry.name)
         return unless dest
+
+        data = data_from(zip_entry)
 
         FileUtils.mkdir_p(dest.dirname)
         File.write(dest, config.translations_converter.call(data), mode: 'w:UTF-8')

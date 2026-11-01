@@ -26,13 +26,14 @@ describe LokaliseManager::TaskDefinitions::Importer do
 
   describe '#open_and_process_zip' do
     it 're-raises errors during file processing' do
-      entry = double
-      allow(entry).to receive(:name).and_return('fail.yml')
+      entry = instance_double(Zip::Entry, name: 'fail.yml', file?: true, symlink?: false)
+
       allow(described_object).to receive(:data_from).with(entry).and_raise(EncodingError)
+
       expect { described_object.send(:process_entry, entry) }
         .to raise_error(EncodingError)
 
-      expect(described_object).to have_received(:data_from)
+      expect(described_object).to have_received(:data_from).with(entry)
     end
 
     it 're-raises errors during file opening' do
